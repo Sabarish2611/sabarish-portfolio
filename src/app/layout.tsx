@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/next";
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { CommandMenuLauncher } from "@/components/layout/command-menu-launcher";
@@ -10,6 +11,7 @@ import { Providers } from "@/components/providers/providers";
 import { site, siteUrl } from "@/content/site";
 import { BASE_OPEN_GRAPH, SITE_DESCRIPTION, SITE_TITLE } from "@/lib/metadata";
 import { DEFAULT_ACCENT, DEFAULT_THEME, PREFERENCES_SCRIPT } from "@/lib/preferences";
+import { Suspense } from "react";
 import "./globals.css";
 
 const serif = Instrument_Serif({
@@ -80,6 +82,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <CursorLoader />
         </Providers>
         <div className="grain" aria-hidden="true" />
+        {/* Vercel Web Analytics (no-op in development). It reads the route, so it needs a Suspense
+            boundary under cacheComponents. */}
+        <Suspense fallback={null}>
+          <Analytics />
+        </Suspense>
       </body>
     </html>
   );
