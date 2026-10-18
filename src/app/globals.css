@@ -1,0 +1,458 @@
+@import "tailwindcss" source("..");
+
+/* Theme switching is attribute-driven (set before paint by PREFERENCES_SCRIPT). */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+@custom-variant light (&:where([data-theme=light], [data-theme=light] *));
+
+/* ------------------------------------------------------------------------------------------
+   Runtime design tokens. Contrast was validated (WCAG): text #EDEAE4 on #0B0B0C is 16.4:1,
+   muted 6.7:1. In light mode the raw accents fail as text (lime 1.09:1, orange 2.63:1), so
+   --accent is fill-only there and accent-coloured text/lines use --accent-ink (>= 4.8:1).
+   ------------------------------------------------------------------------------------------ */
+@layer base {
+  :root,
+  [data-theme="dark"] {
+    --bg: #0b0b0c;
+    --bg-elevated: #131315;
+    --bg-sunken: #070708;
+    --fg: #edeae4;
+    --fg-muted: #9a968e;
+    --fg-subtle: #6e6b65; /* decorative only (3.6:1) */
+    --line: rgb(237 234 228 / 0.12);
+    --line-strong: rgb(237 234 228 / 0.24);
+    --particle: #edeae4;
+    --grain-opacity: 0.075;
+    color-scheme: dark;
+  }
+
+  [data-theme="light"] {
+    --bg: #efece6;
+    --bg-elevated: #f8f6f1;
+    --bg-sunken: #e5e1d9;
+    --fg: #0b0b0c;
+    --fg-muted: #5e5b55;
+    --fg-subtle: #8a867e;
+    --line: rgb(11 11 12 / 0.12);
+    --line-strong: rgb(11 11 12 / 0.24);
+    --particle: #1a1a1c;
+    --grain-opacity: 0.05;
+    color-scheme: light;
+  }
+
+  :root,
+  [data-accent="lime"] {
+    --accent: #c6f432;
+    --accent-ink: #c6f432;
+    --on-accent: #0b0b0c;
+  }
+
+  [data-accent="orange"] {
+    --accent: #ff5b1f;
+    --accent-ink: #ff5b1f;
+    --on-accent: #0b0b0c;
+  }
+
+  [data-theme="light"][data-accent="lime"] {
+    --accent-ink: #4a6b00;
+  }
+
+  [data-theme="light"][data-accent="orange"] {
+    --accent-ink: #b93d0e;
+  }
+
+  :root {
+    --gutter: clamp(1.25rem, 0.6rem + 2.8vw, 3rem);
+    --section-pad: clamp(6rem, 3.5rem + 9vw, 13rem);
+    --header-h: 4.5rem;
+    --header-gap: clamp(3.5rem, 1.75rem + 5.5vw, 8rem);
+    --dur-fast: 350ms;
+    --dur-base: 700ms;
+    --dur-slow: 1100ms;
+    --z-header: 40;
+    --z-menu: 50;
+    --z-grain: 60;
+    --z-dialog: 70;
+    --z-preloader: 80;
+    --z-cursor: 90;
+  }
+}
+
+/* Only the design-system palette exists — no stray zinc-500s. Must come before the tokens below:
+   `initial` clears every --color-* defined earlier. */
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+}
+
+/* Tokens -> utilities. `inline` because every value is a runtime variable (theme/accent/font). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-bg-sunken: var(--bg-sunken);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-on-accent: var(--on-accent);
+
+  --font-sans: var(--font-geist);
+  --font-serif: var(--font-instrument-serif);
+  --font-mono: var(--font-geist-mono);
+}
+
+@theme {
+  /* Fluid type scale. Display sizes are serif; figures are sans (data-viz rule). */
+  --text-hero: clamp(3.25rem, 16.8vw, 17rem);
+  --text-hero--line-height: 0.84;
+  --text-hero--letter-spacing: -0.035em;
+  --text-display: clamp(2.75rem, 1.1rem + 6.6vw, 8.5rem);
+  --text-display--line-height: 0.92;
+  --text-display--letter-spacing: -0.03em;
+  --text-headline: clamp(2rem, 1.15rem + 3.4vw, 4.75rem);
+  --text-headline--line-height: 1;
+  --text-headline--letter-spacing: -0.02em;
+  --text-statement: clamp(1.625rem, 0.95rem + 2.7vw, 3.5rem);
+  --text-statement--line-height: 1.14;
+  --text-statement--letter-spacing: -0.015em;
+  --text-title: clamp(1.375rem, 1.1rem + 1.1vw, 2rem);
+  --text-title--line-height: 1.15;
+  --text-title--letter-spacing: -0.01em;
+  --text-lead: clamp(1.125rem, 1rem + 0.5vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-figure: clamp(3rem, 1.8rem + 4vw, 6rem);
+  --text-figure--line-height: 1;
+  --text-figure--letter-spacing: -0.035em;
+  --text-stat: clamp(1.75rem, 1.4rem + 1.2vw, 2.5rem);
+  --text-stat--line-height: 1.05;
+  --text-stat--letter-spacing: -0.025em;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1.25;
+  --text-label--letter-spacing: 0.08em;
+
+  /* Motion language — mirrored in src/lib/gsap.ts (EASE) */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+
+  --radius-card: 1.75rem;
+
+  --animate-marquee: marquee var(--marquee-duration, 45s) linear infinite;
+  --animate-marquee-reverse: marquee var(--marquee-duration, 45s) linear infinite reverse;
+
+  @keyframes marquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+}
+
+/* Page container with the shared gutter. */
+@utility container-page {
+  width: 100%;
+  max-width: 100rem;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+@utility section-pad {
+  padding-block: var(--section-pad);
+}
+
+/* Small uppercase mono meta text: "(01) About", dates, stack chips. */
+@utility eyebrow {
+  font-family: var(--font-geist-mono);
+  font-size: var(--text-label);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Underline that draws in from the left on hover/focus. */
+@utility link-draw {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size var(--dur-base) var(--ease-out);
+  &:hover,
+  &:focus-visible {
+    background-size: 100% 1px;
+  }
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    min-height: 100svh;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  /* Entrance-animated content is hidden only when JS is running (data-js comes from the head
+     script); a failsafe reveals it if the animation code never initialises. */
+  [data-js] [data-reveal] {
+    visibility: hidden;
+    animation: reveal-failsafe 0s linear 4s forwards;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-js] [data-reveal] {
+      visibility: visible;
+      animation: none;
+    }
+  }
+}
+
+@keyframes reveal-failsafe {
+  to {
+    visibility: visible;
+  }
+}
+
+/* Preloader never shows when the intro is skipped (repeat visit / reduced motion) or JS is off. */
+html[data-intro="skip"] .preloader,
+html:not([data-js]) .preloader {
+  display: none;
+}
+
+/* SplitText line masks clip at the line box; give ascenders/descenders room without moving text. */
+.reveal-line-mask,
+.hero-char-mask {
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+/* Stacked line masks: adjacent negative margins collapse (to -0.12em, not -0.24em), which would
+   open every split line by 0.12em. Restore the full offset between siblings. */
+.reveal-line-mask + .reveal-line-mask {
+  margin-top: -0.24em;
+}
+
+/* Skip link: visible only on keyboard focus. */
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--font-geist-mono);
+  font-size: var(--text-label);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transform: translateY(-200%);
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+/* Film grain: one pre-rasterised noise tile, jittered with a compositor-only transform. */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: var(--z-grain);
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 1.4 -0.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 0.9s steps(5) infinite;
+}
+
+@keyframes grain {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  20% {
+    transform: translate3d(-4%, 3%, 0);
+  }
+  40% {
+    transform: translate3d(3%, -5%, 0);
+  }
+  60% {
+    transform: translate3d(-6%, -2%, 0);
+  }
+  80% {
+    transform: translate3d(5%, 4%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain {
+    animation: none;
+  }
+}
+
+/* Custom cursor hides the native one only while it is mounted (fine pointers). */
+.has-cursor,
+.has-cursor * {
+  cursor: none !important;
+}
+
+/* ------------------------------------------------------------------------------------------
+   View transitions: page navigation (React <ViewTransition> + Link transitionTypes) and the
+   circular theme reveal (document.startViewTransition from setTheme).
+   ------------------------------------------------------------------------------------------ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 700ms;
+  animation-timing-function: var(--ease-in-out);
+}
+
+::view-transition-old(.nav-forward),
+::view-transition-old(.nav-back) {
+  animation:
+    240ms var(--ease-in) both vt-fade-out,
+    700ms var(--ease-in-out) both vt-slide-out;
+}
+
+::view-transition-new(.nav-forward),
+::view-transition-new(.nav-back) {
+  animation:
+    420ms var(--ease-out) 260ms both vt-fade-in,
+    700ms var(--ease-in-out) both vt-slide-in;
+}
+
+::view-transition-old(.nav-forward) {
+  --vt-offset: -6vh;
+}
+::view-transition-new(.nav-forward) {
+  --vt-offset: 10vh;
+}
+::view-transition-old(.nav-back) {
+  --vt-offset: 6vh;
+}
+::view-transition-new(.nav-back) {
+  --vt-offset: -10vh;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+@keyframes vt-slide-out {
+  to {
+    translate: 0 var(--vt-offset);
+  }
+}
+@keyframes vt-slide-in {
+  from {
+    translate: 0 var(--vt-offset);
+  }
+}
+
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Theme: the new theme grows out of the toggle as a circle. */
+html[data-vt="theme"]::view-transition-old(root) {
+  animation: none;
+}
+html[data-vt="theme"]::view-transition-new(root) {
+  animation: vt-theme-reveal 900ms var(--ease-in-out) both;
+}
+@keyframes vt-theme-reveal {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}
+
+/* Headings that receive programmatic focus (see lib/focus-section.ts) don't paint a ring — the
+   move is announced, and the content itself is the visual cue. Sections clear the fixed header. */
+h1[tabindex="-1"]:focus,
+h2[tabindex="-1"]:focus {
+  outline: none;
+}
+
+section[id] {
+  scroll-margin-top: var(--header-h);
+}
+
+/* Forced colours paint the cursor follower black on black. CursorLoader never mounts it there; this
+   covers a mode switch mid-session until React catches up: native pointer back, follower gone. */
+@media (forced-colors: active) {
+  .has-cursor,
+  .has-cursor * {
+    cursor: auto !important;
+  }
+
+  [data-cursor-root] {
+    display: none;
+  }
+}
