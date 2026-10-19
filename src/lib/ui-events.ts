@@ -16,7 +16,7 @@ export function toggleMobileMenu() {
 export const SECTIONS = [
   { id: "about", label: "About" },
   { id: "experience", label: "Experience" },
-  { id: "work", label: "Work" },
+  { id: "work", label: "Projects" },
   { id: "toolkit", label: "Toolkit" },
   { id: "contact", label: "Contact" },
 ] as const;

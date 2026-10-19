@@ -4,7 +4,7 @@ import { DecodeText } from "./decode-text";
 import { RevealText } from "./reveal-text";
 
 /**
- * Standard section opener: "(02) Selected work" eyebrow + serif display heading.
+ * Standard section opener: "(03) Projects" eyebrow + serif display heading.
  * `headingId` should be referenced by the section's aria-labelledby.
  */
 export function SectionHeader({

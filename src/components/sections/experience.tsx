@@ -52,7 +52,7 @@ export async function Experience() {
     <section
       id="experience"
       aria-labelledby="experience-title"
-      className="section-pad md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-center md:py-[clamp(0.75rem,2svh,2rem)]"
+      className="section-pad"
     >
       <TimelineMotion className="container-page">
         <SectionHeader

@@ -94,8 +94,8 @@ export function About() {
       id="about"
       aria-labelledby="about-title"
       // From tablets up the whole section, title to ticker, fits one screen under the header: type and
-      // gaps follow the screen's height as well as its width (svh), and the content sits centred.
-      className="section-pad md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-center md:py-[clamp(0.75rem,2svh,2rem)]"
+      // gaps follow the screen's height as well as its width (svh). Spacing around it is section-pad.
+      className="section-pad"
     >
       <div className="container-page grid grid-cols-12 gap-x-3 gap-y-10 sm:gap-x-6 md:gap-y-[clamp(1.25rem,4svh,3rem)]">
         <div className="col-span-12 md:col-span-8">
@@ -117,10 +117,11 @@ export function About() {
         <RevealImage
           src={portrait}
           alt={`Portrait of ${site.name}`}
-          sizes="(min-width: 1600px) 340px, (min-width: 1024px) 22vw, (min-width: 768px) 30vw, (min-width: 640px) 42vw, 58vw"
-          // Graded "mono" (scripts/grade-photo.mjs) and framed wide, under a lighter grain than the other
-          // photos. Its width (so its height) follows the screen's height: never taller than the text.
-          className="col-span-7 aspect-3/5 [--cut:0.875rem] [--grain:0.12] sm:col-span-5 md:col-span-4 md:col-start-9 md:row-span-2 md:row-start-1 md:w-full md:max-w-[30svh] md:self-start md:justify-self-end lg:col-span-3 lg:col-start-10 xl:[--cut:1.125rem]"
+          sizes="(min-width: 1600px) 440px, (min-width: 1024px) 26vw, (min-width: 768px) 32vw, (min-width: 640px) 52vw, 79vw"
+          // Graded "mono" (scripts/grade-photo.mjs), under a lighter grain than the other photos. The file is
+          // a wide 3:5 crop; the 4:5 card shows its middle. Its width (so its height) follows the screen's
+          // height: never taller than the text.
+          className="col-span-9 aspect-4/5 [--cut:0.875rem] [--grain:0.12] sm:col-span-6 md:col-span-4 md:col-start-9 md:row-span-2 md:row-start-1 md:w-full md:max-w-[40svh] md:self-start md:justify-self-end xl:[--cut:1.125rem]"
         />
 
         <RevealText className="col-span-12 max-w-[54ch] font-serif text-[length:clamp(1.125rem,min(1.75vw,2.7svh),1.625rem)] leading-[1.4] text-fg md:col-span-8 md:row-start-2">

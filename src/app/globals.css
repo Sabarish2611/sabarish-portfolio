@@ -89,7 +89,9 @@
 
   :root {
     --gutter: clamp(1.25rem, 0.6rem + 2.8vw, 3rem);
-    --section-pad: clamp(6rem, 3.5rem + 9vw, 13rem);
+    /* Every section's top and bottom padding, so every gap between sections is the same (twice this).
+       It follows the screen's height: the one-screen sections still fit below the header. */
+    --section-pad: clamp(3.5rem, 10svh, 7.5rem);
     --header-h: 4.5rem;
     --header-gap: clamp(3.5rem, 1.75rem + 5.5vw, 8rem);
     --dur-fast: 350ms;

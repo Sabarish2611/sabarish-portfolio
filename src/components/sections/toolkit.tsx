@@ -43,6 +43,7 @@ export function Toolkit() {
     <section id="toolkit" aria-labelledby="toolkit-title" className="section-pad">
       <div className="container-page">
         <SectionHeader
+          compact
           index="04"
           label="Toolkit"
           headingId="toolkit-title"

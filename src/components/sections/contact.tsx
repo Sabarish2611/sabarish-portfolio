@@ -87,7 +87,7 @@ export function Contact() {
       id="contact"
       ref={root}
       aria-labelledby="contact-title"
-      className="section-pad md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-center md:py-[clamp(1rem,3svh,2.5rem)]"
+      className="section-pad"
     >
       <div className="container-page grid grid-cols-12 gap-x-3 gap-y-10 sm:gap-x-6 md:gap-y-[clamp(1.25rem,4svh,3rem)]">
         <p className="eyebrow col-span-12 flex items-center gap-3 text-fg-muted">

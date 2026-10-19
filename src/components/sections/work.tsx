@@ -12,21 +12,23 @@ export function Work() {
     <section id="work" aria-labelledby="work-title" className="section-pad">
       <div className="container-page">
         <SectionHeader
+          compact
           index="03"
-          label="Selected work"
+          label="Projects"
           headingId="work-title"
           heading={
             <>
-              {"Four systems, "}
-              <span data-hl className="hl">
-                real numbers.
+              <span data-hl className="hl italic">
+                Proof,
               </span>
+              {" not promises."}
             </>
           }
+          // The systems are confidential: say so, or the visuals pass for screenshots of them.
           aside={
-            <RevealText delay={0.15} className="max-w-[36ch] text-fg-muted">
-              Four case studies, built at Trellix — three in my data-scientist role, one as an intern. The systems
-              are confidential, so the visuals are illustrations, not screenshots.
+            <RevealText delay={0.15} className="eyebrow flex flex-col gap-1.5 text-fg-muted lg:items-end lg:pb-3">
+              <span className="text-fg">Confidential systems</span>
+              <span>Illustrations, not screenshots</span>
             </RevealText>
           }
         />

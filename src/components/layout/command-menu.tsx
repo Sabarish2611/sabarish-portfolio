@@ -33,11 +33,9 @@ const MOTION_CSS = `
 [cmdk-dialog][data-state=closed]{animation:cmdk-fade-out .12s linear forwards}
 }`;
 
-const SECTION_LABELS: Partial<Record<SectionId, string>> = { work: "Selected work" };
-
 const SECTION_KEYWORDS: Record<SectionId, string[]> = {
   about: ["bio", "introduction", "summary"],
-  work: ["projects", "portfolio", "case studies"],
+  work: ["work", "portfolio", "case studies"],
   experience: ["career", "roles", "timeline", "trellix"],
   toolkit: ["skills", "stack", "tools"],
   contact: ["hire", "reach out", "get in touch"],
@@ -425,7 +423,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
       entries: [
         { value: "Home", label: "Home", keywords: ["top", "start", "intro"], icon: <Icon name="top" />, hint: "Top", onSelect: () => goTo(null) },
         ...SECTIONS.map((section, i) => {
-          const label = SECTION_LABELS[section.id] ?? section.label;
+          const label = section.label;
           return {
             value: label,
             label,

@@ -26,7 +26,7 @@ export function CaseStudyHero({ project }: { project: Project }) {
         >
           ←
         </span>
-        <span className="link-draw">All work</span>
+        <span className="link-draw">All projects</span>
       </Link>
 
       <div className="grid grid-cols-12 gap-x-6 pt-[clamp(2.5rem,1rem+5vw,6.5rem)]">
