@@ -16,14 +16,19 @@ export const site = {
   monogram: "SG",
   role: "Data Scientist",
   company: "Trellix",
-  email: "sabarish261101@gmail.com",
+  /** Current address, confirmed by Sabarish; the résumé PDF still lists an older one until it's updated. */
+  email: "sabarishwaran.ganesan@gmail.com",
   location: {
     city: "Trichy",
     region: "Tamil Nadu",
     country: "India",
     timeZone: "Asia/Kolkata",
     timeZoneLabel: "IST",
+    /** IST has no daylight saving: always five and a half hours ahead of UTC. */
+    utcOffset: "UTC+5:30",
   },
+  /** Not on the résumé: confirmed by Sabarish, who will work wherever a role needs. */
+  openTo: "Relocation & travel",
   links: {
     linkedin: "https://www.linkedin.com/in/sabarishwaran-g",
     resume: "/Sabarishwaran_G_Resume.pdf",
@@ -88,6 +93,27 @@ export const skillGroups: readonly SkillGroup[] = [
   { label: "Visualization", items: ["Matplotlib", "Seaborn", "Plotly"] },
 ];
 
+/**
+ * The skills above that are fields or methods rather than tools. About's ticker sets these as words
+ * on its first line; every other skill is a tool, on the second line with its logo where it has one.
+ */
+export const methodSkills: readonly string[] = [
+  "Machine Learning",
+  "Deep Learning",
+  "Transformers",
+  "Autoencoders",
+  "NLP",
+  "Computer Vision",
+  "Reinforcement Learning",
+  "LLMs",
+  "Statistical Modeling",
+  "Linear Algebra",
+  "A/B Testing",
+  "Exploratory Data Analysis",
+  "Data Wrangling",
+  "Feature Engineering",
+];
+
 export type Role = {
   title: string;
   org: string;
@@ -96,6 +122,8 @@ export type Role = {
   /** ISO-ish dates for <time dateTime>. */
   startISO: string;
   endISO?: string;
+  /** The office's city. Not on the résumé: confirmed by Sabarish. */
+  place?: string;
   summary: string;
   projects: readonly string[]; // project slugs
 };
@@ -107,6 +135,7 @@ export const experience: readonly Role[] = [
     start: "Jul 2023",
     end: "Present",
     startISO: "2023-07",
+    place: "Bangalore",
     summary:
       "Production ML for endpoint security — threat detection on EDR telemetry, an end-to-end MLOps pipeline for malware classification on GCP, and autoencoder-based alert prioritization for the SOC.",
     projects: ["edr-threat-detection", "malware-mlops-pipeline", "alert-prioritization"],
@@ -118,6 +147,7 @@ export const experience: readonly Role[] = [
     end: "Jun 2023",
     startISO: "2023-03",
     endISO: "2023-06",
+    place: "Bangalore",
     summary:
       "Built an automated URL categorization pipeline with multilingual transformer embeddings, XGBoost, and SHAP-based interpretation.",
     projects: ["url-categorization"],
@@ -126,6 +156,7 @@ export const experience: readonly Role[] = [
 
 export const education = {
   degree: "B.Tech in Computer Science Engineering (Artificial Intelligence)",
+  degreeShort: "B.Tech, CSE (Artificial Intelligence)",
   school: "Amrita Vishwa Vidyapeetham",
   city: "Coimbatore",
   start: "Sep 2019",

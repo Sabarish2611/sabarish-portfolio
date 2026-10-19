@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, type ElementType, type ReactNode } from "react";
-import { DURATION, EASE, gsap, ScrollTrigger, SplitText, useGSAP } from "@/lib/gsap";
+import { DURATION, EASE, gsap, settlePendingTriggers, SplitText, useGSAP } from "@/lib/gsap";
+import { hideHighlights, highlightTimeline } from "@/lib/highlight";
 import { onIntroReveal } from "@/lib/intro";
 
 type RevealTextProps = {
@@ -21,19 +22,9 @@ type RevealTextProps = {
 };
 
 /**
- * GSAP 3.15 workaround. A new ScrollTrigger force-refreshes the timeline-attached triggers still
- * waiting for their first tick (the project cards' entrances), and the `once` ones that fire in
- * that loop splice the array it is walking: a TypeError that takes the page down whenever it is set
- * up scrolled past them (a /#contact link, a reload mid-page). Initialized in order first, they
- * leave that loop nothing to do.
- */
-function settlePendingTriggers() {
-  for (const trigger of ScrollTrigger.getAll()) if (!trigger.end) trigger.refresh();
-}
-
-/**
- * The site's standard text entrance: lines rise out of a mask as the block scrolls into view.
- * Re-splits on resize/font load (autoSplit); static under reduced motion; readable without JS.
+ * The site's standard text entrance: lines rise out of a mask as the block scrolls into view, then
+ * any `.hl[data-hl]` phrase inside gets its highlighter wipe (lib/highlight.ts). Re-splits on
+ * resize/font load (autoSplit); static under reduced motion; readable without JS.
  */
 export function RevealText({
   as = "p",
@@ -58,6 +49,10 @@ export function RevealText({
       const mm = gsap.matchMedia();
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         let stopIntro = () => {};
+        // Once the entrance has played, a re-split (resize, font swap) shows its end state. Handing
+        // SplitText a new timeline would sync it to the old one's time, and with more lines the
+        // highlight sits later, so its bar would flash back in.
+        let played = false;
         SplitText.create(el, {
           type: "lines",
           mask: "lines",
@@ -67,14 +62,23 @@ export function RevealText({
           onSplit: (self) => {
             gsap.set(el, { autoAlpha: 1 });
             if (!intro) settlePendingTriggers();
-            const reveal = gsap.from(self.lines, {
-              yPercent: 110,
-              duration: DURATION.slow,
-              ease: EASE.out,
-              stagger: 0.08,
-              delay,
-              paused: intro,
-              scrollTrigger: intro ? undefined : { trigger: el, start, once: true },
+            // Every re-split rebuilds the phrases, so look them up here rather than once.
+            const highlights = Array.from(el.querySelectorAll("[data-hl]"));
+            hideHighlights(highlights);
+            const reveal = gsap
+              .timeline({
+                delay,
+                paused: intro || played,
+                scrollTrigger: intro || played ? undefined : { trigger: el, start, once: true },
+              })
+              .from(self.lines, { yPercent: 110, duration: DURATION.slow, ease: EASE.out, stagger: 0.08 });
+            if (highlights.length) reveal.add(highlightTimeline(highlights), 0.45 + self.lines.length * 0.08);
+            if (played) {
+              reveal.progress(1);
+              return;
+            }
+            reveal.eventCallback("onComplete", () => {
+              played = true;
             });
             if (intro) {
               stopIntro();

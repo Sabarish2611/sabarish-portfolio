@@ -25,7 +25,7 @@ function ColumnTitle({ id, children }: { id?: string; children: ReactNode }) {
 export function Footer() {
   return (
     <footer className="border-t border-line">
-      <div className="container-page grid grid-cols-12 gap-x-6 gap-y-12 pt-16 pb-16 md:pt-24 md:pb-24">
+      <div className="container-page grid grid-cols-12 gap-x-3 gap-y-12 pt-16 pb-16 sm:gap-x-6 md:pt-24 md:pb-24">
         <nav aria-labelledby="footer-navigate" className="col-span-6 md:col-span-4 lg:col-span-3">
           <ColumnTitle id="footer-navigate">Navigate</ColumnTitle>
           <ul className="mt-4">
@@ -45,8 +45,9 @@ export function Footer() {
         <div className="col-span-6 md:col-span-4 lg:col-span-5">
           <ColumnTitle>Colophon</ColumnTitle>
           <p className="mt-6 max-w-[34ch] text-fg-muted">
-            Designed &amp; built with Next.js, GSAP, and three.js. Set in{" "}
-            <span className="font-serif text-[1.15em] text-fg italic">Instrument Serif</span>,{" "}
+            {"Designed & built with Next.js and GSAP. Set in "}
+            <span className="font-serif text-[1.15em] text-fg italic">Instrument Serif</span>
+            {", "}
             <span className="text-fg">Geist</span> and <span className="font-mono text-[0.9em] text-fg">Geist Mono</span>.
           </p>
         </div>
@@ -60,7 +61,8 @@ export function Footer() {
         <FooterWordmark text={firstName} />
         <div className="eyebrow flex items-center justify-between gap-6 border-t border-line py-5 text-fg-muted">
           <p>
-            © <CurrentYear /> {site.name}
+            © <CurrentYear />
+            {` ${site.name}`}
           </p>
         </div>
       </div>

@@ -1,15 +1,15 @@
 /**
- * The vertical rail: a hairline plus the accent line TimelineMotion draws with DrawSVG.
- * The SVG is 1px wide and stretched (preserveAspectRatio="none"), so its length is always
- * 100 user units: the drawn proportion survives any reflow without re-measuring.
- * Starts at the first node's centre and fades out below the last entry.
+ * The phones' rail: a hairline down the left plus the accent line TimelineMotion draws with DrawSVG,
+ * from the first node's centre, fading out below the last entry (the present goes on). The SVG is
+ * 1px wide and stretched (preserveAspectRatio="none"), so its length is always 100 user units: the
+ * drawn proportion survives any reflow without re-measuring. Wider screens use TimelineAxis.
  */
 export function TimelineTrack() {
   return (
     <div
       aria-hidden
-      data-tl-track
-      className="pointer-events-none absolute top-[7.5px] bottom-0 left-[5px] w-px [mask-image:linear-gradient(to_bottom,black_calc(100%-16rem),transparent)]"
+      data-tl-track="y"
+      className="pointer-events-none absolute top-[7.5px] bottom-0 left-[5px] w-px [mask-image:linear-gradient(to_bottom,black_calc(100%-8rem),transparent)] md:hidden"
     >
       <div className="absolute inset-0 bg-line" />
       <svg

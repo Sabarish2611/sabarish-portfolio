@@ -18,7 +18,7 @@ function ArrowDown({ className }: { className?: string }) {
 }
 
 /**
- * Large circular download button. Its ::before stretches over the parent tile (which must be
+ * Large cut-corner download button. Its ::before stretches over the parent tile (which must be
  * `relative`), so the whole card is the hit area; hovering anywhere on the card fills the button.
  */
 export function ResumeLink() {
@@ -27,12 +27,12 @@ export function ResumeLink() {
       href={site.links.resume}
       download
       aria-label="Download résumé (PDF)"
-      className="group/dl inline-flex shrink-0 rounded-full before:absolute before:inset-0 before:rounded-card before:content-['']"
+      className="group/dl inline-flex shrink-0 before:absolute before:inset-0 before:content-['']"
     >
-      <span className="relative grid size-16 place-items-center overflow-hidden rounded-full border border-line-strong text-fg transition-colors duration-500 ease-out group-hover/tile:border-transparent group-hover/tile:text-on-accent group-focus-visible/dl:border-transparent group-focus-visible/dl:text-on-accent lg:size-20">
+      <span className="grid size-16 chamfer-outline place-items-center overflow-hidden text-fg transition-colors duration-500 ease-out [--cut:0.875rem] group-hover/tile:text-on-accent group-hover/tile:[--outline:transparent] group-focus-visible/dl:text-on-accent group-focus-visible/dl:[--outline:transparent] lg:size-20 lg:[--cut:1rem]">
         <span
           aria-hidden
-          className="absolute inset-0 scale-0 rounded-full bg-accent transition duration-500 ease-out group-hover/tile:scale-100 group-focus-visible/dl:scale-100 motion-reduce:scale-100 motion-reduce:opacity-0 motion-reduce:group-hover/tile:opacity-100 motion-reduce:group-focus-visible/dl:opacity-100"
+          className="chamfer absolute inset-0 scale-0 bg-accent transition duration-500 ease-out group-hover/tile:scale-100 group-focus-visible/dl:scale-100 motion-reduce:scale-100 motion-reduce:opacity-0 motion-reduce:group-hover/tile:opacity-100 motion-reduce:group-focus-visible/dl:opacity-100"
         />
         <span className="relative size-6 overflow-hidden lg:size-7">
           <ArrowDown className="size-full transition-transform duration-500 ease-out motion-safe:group-hover/tile:translate-y-full" />

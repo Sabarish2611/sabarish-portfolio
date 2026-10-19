@@ -60,6 +60,33 @@
     --accent-ink: #b93d0e;
   }
 
+  /* A section painted in the accent (the contact finale; the header adopts it while over one).
+     Ink on accent: the accent's job (actions, highlights) passes to near-black, and text that sits
+     on the accent (on-accent) becomes the accent colour itself. Contrast: ink on lime 16:1, on
+     orange 6.5:1; muted ink at 78% stays above 4.5:1 on both. */
+  [data-theme="accent"] {
+    --bg: #c6f432;
+    --bg-elevated: #d1f65a;
+    --bg-sunken: #b5df2e;
+    --fg: #0b0b0c;
+    --fg-muted: rgb(11 11 12 / 0.78);
+    --fg-subtle: rgb(11 11 12 / 0.5);
+    --line: rgb(11 11 12 / 0.16);
+    --line-strong: rgb(11 11 12 / 0.32);
+    --accent: #0b0b0c;
+    --accent-ink: #0b0b0c;
+    --on-accent: #c6f432;
+    color-scheme: light;
+  }
+
+  [data-accent="orange"] [data-theme="accent"],
+  [data-accent="orange"][data-theme="accent"] {
+    --bg: #ff5b1f;
+    --bg-elevated: #ff7440;
+    --bg-sunken: #e84f15;
+    --on-accent: #ff5b1f;
+  }
+
   :root {
     --gutter: clamp(1.25rem, 0.6rem + 2.8vw, 3rem);
     --section-pad: clamp(6rem, 3.5rem + 9vw, 13rem);
@@ -174,6 +201,111 @@
   text-transform: uppercase;
 }
 
+/* Photo cards: the top-right and bottom-left corners cut at 45°. Set the cut with --cut (a length,
+   so both legs match). Anything the card animates lives on a child: this clip-path stays put. */
+@utility chamfer {
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut, 1rem)) 0,
+    100% var(--cut, 1rem),
+    100% 100%,
+    var(--cut, 1rem) 100%,
+    0 calc(100% - var(--cut, 1rem))
+  );
+}
+
+/* The chamfer's outline, for bordered surfaces (a CSS border would be clipped off the cut corners):
+   the outer contour, then the same shape inset by --ring (default 1px), filled evenodd so only the
+   ring between them paints. Colour it with a background; put it on an absolute inset-0 layer. The
+   inner diagonals are offset by --ring·√2 along each axis, so the ring is as thick on the cuts. */
+@utility chamfer-ring {
+  --c: var(--cut, 1rem);
+  --w: var(--ring, 1px);
+  clip-path: polygon(
+    evenodd,
+    0 0,
+    calc(100% - var(--c)) 0,
+    100% var(--c),
+    100% 100%,
+    var(--c) 100%,
+    0 calc(100% - var(--c)),
+    0 0,
+    var(--w) var(--w),
+    var(--w) calc(100% - var(--c) - var(--w) * 0.414),
+    calc(var(--c) + var(--w) * 0.414) calc(100% - var(--w)),
+    calc(100% - var(--w)) calc(100% - var(--w)),
+    calc(100% - var(--w)) calc(var(--c) + var(--w) * 0.414),
+    calc(100% - var(--c) - var(--w) * 0.414) var(--w),
+    var(--w) var(--w)
+  );
+}
+
+/* Cut-corner controls: the shape is painted on ::before, behind the content, so the element itself
+   stays unclipped (a clip-path would clip its focus ring). Outline colour via --outline, fill via
+   --fill; corner size via --cut (default 0.5rem). */
+@utility chamfer-outline {
+  position: relative;
+  isolation: isolate;
+  --c: var(--cut, 0.5rem);
+  --w: var(--ring, 1px);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--outline, var(--line-strong));
+    transition: background-color var(--dur-fast) var(--ease-out);
+    clip-path: polygon(
+      evenodd,
+      0 0,
+      calc(100% - var(--c)) 0,
+      100% var(--c),
+      100% 100%,
+      var(--c) 100%,
+      0 calc(100% - var(--c)),
+      0 0,
+      var(--w) var(--w),
+      var(--w) calc(100% - var(--c) - var(--w) * 0.414),
+      calc(var(--c) + var(--w) * 0.414) calc(100% - var(--w)),
+      calc(100% - var(--w)) calc(100% - var(--w)),
+      calc(100% - var(--w)) calc(var(--c) + var(--w) * 0.414),
+      calc(100% - var(--c) - var(--w) * 0.414) var(--w),
+      var(--w) var(--w)
+    );
+  }
+}
+
+@utility chamfer-fill {
+  position: relative;
+  isolation: isolate;
+  --c: var(--cut, 0.5rem);
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-color: var(--fill, var(--accent));
+    transition: background-color var(--dur-fast) var(--ease-out);
+    clip-path: polygon(0 0, calc(100% - var(--c)) 0, 100% var(--c), 100% 100%, var(--c) 100%, 0 calc(100% - var(--c)));
+  }
+}
+
+/* Object-detection corner brackets in currentColor, drawn by one element (absolute, inset as
+   needed). Arm length and stroke via --arm / --stroke. Used for the "lock-on" hover states. */
+@utility detect-brackets {
+  --bracket: linear-gradient(currentColor, currentColor);
+  background:
+    var(--bracket) top left / var(--arm, 0.75rem) var(--stroke, 1.5px),
+    var(--bracket) top left / var(--stroke, 1.5px) var(--arm, 0.75rem),
+    var(--bracket) top right / var(--arm, 0.75rem) var(--stroke, 1.5px),
+    var(--bracket) top right / var(--stroke, 1.5px) var(--arm, 0.75rem),
+    var(--bracket) bottom left / var(--arm, 0.75rem) var(--stroke, 1.5px),
+    var(--bracket) bottom left / var(--stroke, 1.5px) var(--arm, 0.75rem),
+    var(--bracket) bottom right / var(--arm, 0.75rem) var(--stroke, 1.5px),
+    var(--bracket) bottom right / var(--stroke, 1.5px) var(--arm, 0.75rem);
+  background-repeat: no-repeat;
+}
+
 /* Underline that draws in from the left on hover/focus. */
 @utility link-draw {
   background-image: linear-gradient(currentColor, currentColor);
@@ -256,11 +388,24 @@ html:not([data-js]) .preloader {
   display: none;
 }
 
-/* SplitText line masks clip at the line box; give ascenders/descenders room without moving text. */
+/* SplitText line masks clip at the line box; give ascenders/descenders room without moving text,
+   and the highlighter's 0.08em overhang (.hl) room at a line's ends. */
 .reveal-line-mask,
 .hero-char-mask {
   padding-block: 0.12em;
   margin-block: -0.12em;
+}
+
+.reveal-line-mask {
+  padding-inline: 0.08em;
+  margin-inline: -0.08em;
+}
+
+/* Tight tracking makes a char's box narrower than its glyph: room for the overhang, so the hero name's
+   letters aren't shaved (the flying copy in the header masks its letters the same way). */
+.hero-char-mask {
+  padding-inline: 0.05em;
+  margin-inline: -0.05em;
 }
 
 /* Stacked line masks: adjacent negative margins collapse (to -0.12em, not -0.24em), which would
@@ -291,10 +436,105 @@ html:not([data-js]) .preloader {
   transform: none;
 }
 
+/* Highlighter: a key phrase gets a translucent marker stripe; on reveal a solid bar sweeps across
+   and retracts (lib/highlight.ts drives the variables). Without JS or under reduced motion the marker
+   is simply there. Kept on one line (nowrap), though the line splitter can still cut it into pieces:
+   they sweep as one stroke, and where two meet side by side neither overhangs (no brighter seam). */
+.hl {
+  position: relative;
+  isolation: isolate;
+  white-space: nowrap;
+}
+
+.hl::before,
+.hl::after {
+  content: "";
+  position: absolute;
+  inset-inline: -0.08em;
+  pointer-events: none;
+}
+
+/* The line splitter can leave an empty copy of the span at a line edge: no marker for it. */
+.hl:empty::before,
+.hl:empty::after {
+  display: none;
+}
+
+.hl:not(:empty) + .hl::before,
+.hl:not(:empty) + .hl::after {
+  inset-inline-start: 0;
+}
+
+.hl:has(+ .hl:not(:empty))::before,
+.hl:has(+ .hl:not(:empty))::after {
+  inset-inline-end: 0;
+}
+
+.hl::before {
+  z-index: -1;
+  top: 56%;
+  bottom: 0.04em;
+  background: color-mix(in oklab, var(--accent) 34%, transparent);
+  transform: scaleX(var(--hl-mark, 1));
+  transform-origin: left;
+}
+
+.hl::after {
+  top: 0.1em;
+  bottom: 0.02em;
+  background: var(--accent);
+  transform: scaleX(var(--hl-bar, 0));
+  transform-origin: var(--hl-origin, left);
+}
+
+/* Letter roll (ui/roll-text.tsx): each letter carries its own copy one line below as a text-shadow
+   and slides up on hover/focus of the link or button it sits in, staggered by --i. */
+/* A 1.2 line box clips the copy, which waits a full 1.35em below: never peeking out of the box. */
+.roll-chars {
+  display: inline-flex;
+  overflow: clip;
+  line-height: 1.2;
+}
+
+.roll-char {
+  display: inline-block;
+  white-space: pre;
+  text-shadow: 0 1.35em currentColor;
+  transition: translate 0.55s var(--ease-out) calc(var(--i, 0) * 18ms);
+}
+
+/* [data-roll-scope]: a card whose label sits outside its (stretched) link. */
+@media (hover: hover) {
+  :is(a, button, [data-roll-scope]):hover .roll-char {
+    translate: 0 -1.35em;
+  }
+}
+
+:is(a, button):focus-visible .roll-char,
+[data-roll-scope]:has(:focus-visible) .roll-char {
+  translate: 0 -1.35em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .roll-char {
+    transition: none;
+    translate: none !important;
+  }
+}
+
+/* Forced colours drop text-shadow, so there is no copy to roll in: the letters stay where they are. */
+@media (forced-colors: active) {
+  .roll-char {
+    translate: none !important;
+  }
+}
+
 /* Film grain: one pre-rasterised noise tile, jittered with a compositor-only transform. */
 .grain {
   position: fixed;
-  inset: -50%;
+  /* The jitter moves it at most 6% of its size: a 10% overhang is enough, and a far smaller layer
+     than a 4x-viewport one (GPU memory on high-DPR phones). */
+  inset: -10%;
   z-index: var(--z-grain);
   pointer-events: none;
   opacity: var(--grain-opacity);
@@ -327,6 +567,16 @@ html:not([data-js]) .preloader {
   .grain {
     animation: none;
   }
+}
+
+/* Film grain over the photos (signal from noise): luminance noise around mid-grey. Hard-light, so
+   the speckle shows in the highlights (a bright sky) as well as the shadows; overlay or soft-light
+   barely touch near-white. Static; the page grain already moves. */
+.photo-noise {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='1.8 0 0 0 -0.4 1.8 0 0 0 -0.4 1.8 0 0 0 -0.4 0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+  mix-blend-mode: hard-light;
+  opacity: var(--grain, 0.35); /* set --grain on a photo card to tune its grain */
 }
 
 /* Custom cursor hides the native one only while it is mounted (fine pointers). */

@@ -104,8 +104,9 @@ export function CopyEmail({ email, className }: { email: string; className?: str
         type="button"
         onClick={copy}
         className={cn(
-          "eyebrow relative inline-flex h-11 items-center rounded-full border px-5 transition-[background-color,border-color,color,scale] duration-300 ease-out active:scale-[0.97]",
-          copied ? "border-transparent bg-accent text-on-accent" : "border-line-strong text-fg hover:border-fg",
+          "eyebrow inline-flex h-11 items-center px-5 transition-[color,scale] duration-300 ease-out active:scale-[0.97]",
+          // Cut-corner hairline; once copied, a solid accent fill (both drawn behind the label).
+          copied ? "chamfer-fill text-on-accent" : "chamfer-outline text-fg hover:[--outline:var(--fg)]",
         )}
       >
         <span className="sr-only">Copy email address</span>

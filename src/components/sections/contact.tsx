@@ -1,26 +1,48 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
+import boatRail from "@/assets/photos/boat-rail.jpg";
 import { CopyEmail } from "@/components/ui/copy-email";
-import { Magnetic } from "@/components/ui/magnetic";
+import { DecodeText } from "@/components/ui/decode-text";
+import { RevealImage } from "@/components/ui/reveal-image";
+import { RevealText } from "@/components/ui/reveal-text";
 import { site } from "@/content/site";
 import { useLocalTime } from "@/hooks/use-local-time";
-import { cn } from "@/lib/cn";
-import { DURATION, EASE, gsap, SplitText, useGSAP } from "@/lib/gsap";
+import { DURATION, EASE, gsap, settlePendingTriggers, useGSAP } from "@/lib/gsap";
 
 const MAILTO = `mailto:${site.email}`;
+// The address is long: narrow columns break it before the "@" rather than overflow.
+const [EMAIL_USER, EMAIL_DOMAIN] = site.email.split("@");
+/** "linkedin.com/in/sabarishwaran-g": the profile URL without its scheme. */
+const LINKEDIN_LABEL = site.links.linkedin.replace(/^https?:\/\/(www\.)?/, "");
 
-const LINKS = [
-  { label: "LinkedIn", href: site.links.linkedin },
-  { label: "Résumé", href: site.links.resume },
-] as const;
+const LINK = "link-draw bg-origin-content py-[max(0px,calc((2.75rem_-_1lh)/2))]";
 
-// Line masks get room for ascenders/descenders (padding) without moving the text (negative margin).
-// Adjacent negative margins collapse instead of adding up, so each later mask pulls up by twice the
-// pad, and every phrase is its own block formatting context: split and unsplit layouts match exactly.
-const HEADING_MASKS =
-  "[&_.contact-line-mask]:-my-[0.14em] [&_.contact-line-mask]:py-[0.14em] [&_.contact-line-mask+.contact-line-mask]:-mt-[0.28em]";
+/**
+ * One label/value row. The hairline above it is a ::before scaled by --rule, so the entrance can draw
+ * it without an extra element (a <dl> row may hold only its dt and dd).
+ */
+function Row({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div
+      data-contact-row
+      className="relative grid gap-1.5 py-[clamp(0.875rem,2svh,1.25rem)] [--rule:1] before:absolute before:inset-x-0 before:top-0 before:h-px before:origin-left before:scale-x-(--rule) before:bg-line lg:grid-cols-[8.5rem_1fr] lg:items-center lg:gap-6"
+    >
+      <dt data-contact-item data-reveal className="eyebrow text-fg-muted">
+        {label}
+      </dt>
+      <dd data-contact-item data-reveal className="flex min-h-11 min-w-0 flex-wrap items-center gap-x-4 gap-y-2">
+        {children}
+      </dd>
+    </div>
+  );
+}
 
+/**
+ * (05) Contact — the finale. The off-the-clock photo, its gaze leading into the details: a short
+ * heading, then every way to get in touch as label/value rows (email with a copy button, LinkedIn, the
+ * résumé, where Sabarish is based, the local time there). From tablets up it fits one screen like About.
+ */
 export function Contact() {
   const root = useRef<HTMLElement>(null);
   const time = useLocalTime(site.location.timeZone);
@@ -29,171 +51,128 @@ export function Contact() {
     () => {
       const section = root.current;
       if (!section) return;
-      const q = gsap.utils.selector(section);
-      const heading = q("[data-contact-heading]")[0];
+      const rows = gsap.utils.toArray<HTMLElement>("[data-contact-row]", section);
+      const items = gsap.utils.toArray<HTMLElement>("[data-contact-item]", section);
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(q("[data-reveal]"), { autoAlpha: 1 });
+        gsap.set(items, { autoAlpha: 1 });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
-        if (!heading) return;
-        // Fresh vars per tween: ScrollTrigger writes its defaults into the object it is given.
-        const enter = () => ({ trigger: heading, start: "top 80%", once: true });
-
-        gsap.from(q("[data-contact-eyebrow]"), { autoAlpha: 0, duration: 0.3, ease: EASE.out, scrollTrigger: enter() });
-
-        // Each phrase is split on its own (a block child would otherwise be sliced per word).
-        // Lines keep whole words, so the heading stays readable without aria rewriting.
-        SplitText.create(q("[data-contact-phrase]"), {
-          type: "lines",
-          mask: "lines",
-          linesClass: "contact-line",
-          aria: "none",
-          autoSplit: true,
-          onSplit: (self) => {
-            gsap.set(heading, { autoAlpha: 1 });
-            return gsap.from(self.lines, {
-              yPercent: 118,
-              duration: DURATION.slow,
-              ease: EASE.out,
-              stagger: 0.09,
-              scrollTrigger: enter(),
-            });
-          },
-        });
-
-        // The circle fades in once the heading has risen.
-        gsap.from(q("[data-contact-cta]"), {
-          autoAlpha: 0,
-          duration: 0.3,
-          ease: EASE.out,
-          delay: 0.35,
-          scrollTrigger: enter(),
-        });
-
-        // Email row, then the links row: a hairline draws in first, items fade in after it.
-        q("[data-contact-group]").forEach((group) => {
-          const groupEnter = () => ({ trigger: group, start: "top 90%", once: true });
-          const rule = group.querySelector("[data-contact-rule]");
-          if (rule) {
-            gsap.from(rule, { scaleX: 0, autoAlpha: 0, duration: DURATION.slow, ease: EASE.inOut, scrollTrigger: groupEnter() });
-          }
-          gsap.from(group.querySelectorAll("[data-contact-item]"), {
-            autoAlpha: 0,
-            duration: 0.3,
-            ease: EASE.out,
-            stagger: 0.06,
-            delay: rule ? 0.2 : 0,
-            scrollTrigger: groupEnter(),
-          });
-        });
+        if (!rows.length) return;
+        // The hairlines draw in one after another, each row's label and value rising in behind its line.
+        settlePendingTriggers();
+        gsap
+          .timeline({ scrollTrigger: { trigger: rows[0], start: "top 90%", once: true } })
+          .fromTo(rows, { "--rule": 0 }, { "--rule": 1, duration: DURATION.slow, ease: EASE.inOut, stagger: 0.08 }, 0)
+          .fromTo(
+            items,
+            { autoAlpha: 0, y: 10 },
+            { autoAlpha: 1, y: 0, duration: DURATION.base, ease: EASE.out, stagger: 0.04 },
+            0.2,
+          );
       });
     },
     { scope: root },
   );
 
   return (
-    <section id="contact" ref={root} aria-labelledby="contact-title" className="section-pad relative overflow-hidden">
-      <div className="container-page">
-        <p data-contact-eyebrow data-reveal className="eyebrow flex items-center gap-3 text-fg-muted">
+    <section
+      id="contact"
+      ref={root}
+      aria-labelledby="contact-title"
+      className="section-pad md:flex md:min-h-[calc(100svh-var(--header-h))] md:flex-col md:justify-center md:py-[clamp(1rem,3svh,2.5rem)]"
+    >
+      <div className="container-page grid grid-cols-12 gap-x-3 gap-y-10 sm:gap-x-6 md:gap-y-[clamp(1.25rem,4svh,3rem)]">
+        <p className="eyebrow col-span-12 flex items-center gap-3 text-fg-muted">
           <span className="text-accent-ink">(05)</span>
           <span aria-hidden className="h-px w-8 bg-line-strong" />
-          Contact
+          <DecodeText>Contact</DecodeText>
         </p>
 
-        <div className="mt-6 grid grid-cols-12 gap-x-6 gap-y-10">
-          <h2
+        {/* Its height follows the screen's (max-w in svh), so the section fits one screen from tablets up. */}
+        <RevealImage
+          src={boatRail}
+          alt={`${site.name} leaning on a boat's rail, looking out over the water`}
+          sizes="(min-width: 1600px) 520px, (min-width: 768px) 36vw, (min-width: 640px) 58vw, 84vw"
+          className="col-span-10 aspect-3/4 w-full [--cut:1rem] [--grain:0.12] sm:col-span-7 md:col-span-5 md:row-start-2 md:max-w-[48svh] lg:[--cut:1.5rem]"
+        />
+
+        <div className="col-span-12 flex flex-col gap-[clamp(2rem,5svh,3.5rem)] md:col-span-7 md:col-start-6 md:row-start-2 md:justify-between">
+          <RevealText
+            as="h2"
             id="contact-title"
-            data-contact-heading
-            data-reveal
-            className={cn(
-              "col-span-12 col-start-1 row-start-1 -ml-[0.04em] font-serif text-[length:clamp(3.25rem,18.5vw,5.5rem)] leading-[0.9] tracking-[-0.03em] md:text-[length:clamp(5rem,11vw,12rem)]",
-              HEADING_MASKS,
-            )}
+            className="font-serif text-[length:clamp(2.75rem,min(6vw,8svh),6.5rem)] leading-[0.92] tracking-[-0.03em]"
           >
-            <span data-contact-phrase className="flow-root">
-              Have a noisy problem?
-            </span>{" "}
-            <span data-contact-phrase className="flow-root text-fg italic">
-              Let&rsquo;s find the signal.
+            {"Let’s "}
+            <span data-hl className="hl italic">
+              talk.
             </span>
-          </h2>
+          </RevealText>
 
-          {/* Offset lives on this wrapper: GSAP owns the transform of the [data-contact-cta] child. */}
-          <div className="col-span-12 row-start-2 -mt-4 justify-self-end lg:col-span-3 lg:col-start-10 lg:row-start-1 lg:mt-0 lg:translate-y-[30%] lg:self-end">
-            <div data-contact-cta data-reveal>
-              <Magnetic strength={0.3}>
-                <a
-                  href={MAILTO}
-                  className="group grid size-36 place-items-center rounded-full bg-accent text-on-accent transition-[scale,background-color,color] duration-700 ease-out hover:scale-[1.06] light:bg-fg light:text-bg light:hover:bg-accent light:hover:text-on-accent lg:size-40 xl:size-44"
+          <dl className="border-b border-line">
+            <Row label="Email">
+              {/* The label keeps the accessible name exact: Chrome reads the <wbr> as a space. */}
+              <a
+                href={MAILTO}
+                aria-label={site.email}
+                className={`${LINK} min-w-0 font-sans text-[length:clamp(1.25rem,1.9vw,1.75rem)] leading-tight tracking-[-0.02em]`}
+              >
+                {EMAIL_USER}
+                <wbr />@{EMAIL_DOMAIN}
+              </a>
+              <CopyEmail email={site.email} />
+            </Row>
+            <Row label="LinkedIn">
+              <a
+                href={site.links.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 text-[length:clamp(1rem,1.3vw,1.1875rem)]"
+              >
+                <span className={LINK}>{LINKEDIN_LABEL}</span>
+                <span
+                  aria-hidden
+                  className="text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-ink"
                 >
-                  <span className="flex items-center gap-2 text-lg font-medium xl:text-xl">
-                    Say hello
-                    <span className="sr-only"> by email</span>
-                    <span aria-hidden className="transition-[rotate] duration-500 ease-out group-hover:-rotate-45">
-                      →
-                    </span>
-                  </span>
-                </a>
-              </Magnetic>
-            </div>
-          </div>
-        </div>
-
-        <div
-          data-contact-group
-          className="mt-14 flex flex-wrap items-center gap-x-8 gap-y-5 md:mt-20 lg:mt-[clamp(6rem,9vw,9rem)]"
-        >
-          {/* Padded up to a 44px touch target on phones; the underline stays on the text (content box). */}
-          <a
-            href={MAILTO}
-            data-contact-item
-            data-reveal
-            className="link-draw bg-origin-content py-[max(0px,calc((2.75rem_-_1lh)/2))] font-sans text-[length:clamp(1.375rem,6.2vw,2rem)] leading-tight tracking-[-0.025em] md:text-headline md:leading-[1.08]"
-          >
-            {site.email}
-          </a>
-          <div data-contact-item data-reveal>
-            <CopyEmail email={site.email} />
-          </div>
-        </div>
-
-        <div data-contact-group className="mt-16 md:mt-24">
-          <div data-contact-rule data-reveal className="h-px origin-left bg-line" />
-          <div className="flex flex-col gap-4 pt-5 md:flex-row md:items-center md:justify-between">
-            <ul className="flex flex-wrap items-center gap-x-8 gap-y-1">
-              {LINKS.map((link) => (
-                <li key={link.label} data-contact-item data-reveal>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex h-11 items-center gap-2 text-lg"
-                  >
-                    <span className="link-draw">{link.label}</span>
-                    <span
-                      aria-hidden
-                      className="text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-ink"
-                    >
-                      ↗
-                    </span>
-                    <span className="sr-only">(opens in new tab)</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <p data-contact-item data-reveal className="eyebrow flex items-center gap-2 text-fg-muted">
-              {site.location.city}, {site.location.country}
-              <span aria-hidden className="text-fg-subtle">
-                ·
+                  ↗
+                </span>
+                <span className="sr-only">(opens in new tab)</span>
+              </a>
+            </Row>
+            <Row label="Résumé">
+              <a
+                href={site.links.resume}
+                download
+                className="group inline-flex items-center gap-2 text-[length:clamp(1rem,1.3vw,1.1875rem)]"
+              >
+                <span className={LINK}>Download PDF</span>
+                <span
+                  aria-hidden
+                  className="text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:translate-y-0.5 group-hover:text-accent-ink"
+                >
+                  ↓
+                </span>
+              </a>
+            </Row>
+            <Row label="Based in">
+              <span className="text-[length:clamp(1rem,1.3vw,1.1875rem)]">
+                {`${site.location.city}, ${site.location.region}, ${site.location.country}`}
               </span>
-              <span data-qa-mask>
-                <time suppressHydrationWarning>{time ?? "--:--"}</time> {site.location.timeZoneLabel}
+              <span className="text-[0.9375rem] text-fg-muted">{`Open to ${site.openTo.toLowerCase()}`}</span>
+            </Row>
+            <Row label="Local time">
+              <span data-qa-mask className="inline-flex items-center gap-2.5 text-[length:clamp(1rem,1.3vw,1.1875rem)]">
+                <span aria-hidden className="size-1.5 rounded-full bg-accent-ink" />
+                <span>
+                  <time suppressHydrationWarning>{time ?? "--:--"}</time>
+                  {` ${site.location.timeZoneLabel}`}
+                </span>
               </span>
-            </p>
-          </div>
+              <span className="text-[0.9375rem] text-fg-muted">{site.location.utcOffset}</span>
+            </Row>
+          </dl>
         </div>
       </div>
     </section>

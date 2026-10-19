@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { projects } from "@/content/projects";
 import { site } from "@/content/site";
+import { WORDMARK } from "./logo";
 import { useAccent, useTheme } from "@/hooks/use-preferences";
 import { cn } from "@/lib/cn";
 import { focusSection } from "@/lib/focus-section";
@@ -243,7 +244,7 @@ function PaletteFooter() {
         </span>
       </p>
       <p className="font-serif text-lg leading-none">
-        {site.shortName}
+        {WORDMARK}
         <span className="text-accent-ink">.</span>
       </p>
     </div>
@@ -265,9 +266,9 @@ function Toast({ message }: { message: string | null }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
             transition={{ type: "spring", visualDuration: 0.35, bounce: 0.15 }}
-            className="pointer-events-none fixed inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-(--z-dialog) mx-auto flex w-fit items-center gap-2.5 rounded-full bg-fg py-2 pr-4 pl-2 text-bg shadow-2xl"
+            className="pointer-events-none fixed inset-x-0 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-(--z-dialog) mx-auto flex w-fit chamfer-fill items-center gap-2.5 py-2 pr-4 pl-2 text-bg drop-shadow-2xl [--cut:0.625rem] [--fill:var(--fg)]"
           >
-            <span className="grid size-6 place-items-center rounded-full bg-accent text-on-accent">
+            <span className="chamfer grid size-6 place-items-center bg-accent text-on-accent [--cut:0.375rem]">
               <Icon name="check" className="size-3.5" />
             </span>
             <span className="eyebrow">{message}</span>
@@ -502,10 +503,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
         vimBindings={false}
         filter={paletteFilter}
         overlayClassName="fixed inset-0 z-(--z-dialog) bg-bg/60 backdrop-blur-sm"
-        contentClassName="fixed inset-x-0 top-[14dvh] z-(--z-dialog) mx-auto w-[min(640px,92vw)] overflow-hidden rounded-card border border-line-strong bg-bg-elevated text-fg shadow-2xl outline-none"
+        contentClassName="chamfer fixed inset-x-0 top-[14dvh] z-(--z-dialog) mx-auto w-[min(640px,92vw)] overflow-hidden bg-bg-elevated text-fg outline-none [--cut:1.25rem]"
         // Never taller than the space below its top offset (landscape phones): the list gives way.
         className="flex max-h-[calc(86dvh-1rem)] flex-col outline-none [&_[cmdk-group-heading]]:px-3 [&_[cmdk-group-heading]]:pt-3 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group][hidden]]:hidden [&_[cmdk-group]+[cmdk-group]]:mt-1.5"
       >
+        <span aria-hidden className="chamfer-ring pointer-events-none absolute inset-0 z-10 bg-line-strong" />
         <div className="flex shrink-0 items-center gap-3 border-b border-line pr-3 pl-5">
           <Icon name="search" className="size-[1.125rem] text-fg-muted" />
           <Command.Input
@@ -520,7 +522,7 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
               if (event.key === "Enter") event.stopPropagation();
             }}
             aria-label="Esc, close command menu"
-            className="eyebrow grid h-10 min-w-10 place-items-center rounded-lg border border-line px-2.5 text-fg-muted transition-colors duration-300 hover:border-line-strong hover:text-fg"
+            className="eyebrow grid h-10 min-w-10 chamfer-outline place-items-center px-2.5 text-fg-muted transition-colors duration-300 [--cut:0.375rem] [--outline:var(--line)] hover:text-fg hover:[--outline:var(--line-strong)]"
           >
             esc
           </button>

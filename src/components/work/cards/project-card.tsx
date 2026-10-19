@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ViewTransition } from "react";
 import { Stat } from "@/components/ui/stat";
+import { RollText } from "@/components/ui/roll-text";
 import { ProjectVisual } from "@/components/work/visuals";
 import type { Project } from "@/content/projects";
 import { cn } from "@/lib/cn";
@@ -24,10 +25,12 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
   return (
     <article
       data-card
+      data-roll-scope
       data-cursor="view"
       className={cn(
-        "group/card relative isolate grid overflow-hidden rounded-card border border-line bg-bg-elevated transition-colors duration-500 hover:border-line-strong lg:grid-cols-12",
-        "has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-4 has-[a:focus-visible]:outline-accent-ink",
+        // Cut corners clip any outline, so focus is shown inside: the ring turns accent and thickens,
+        // and the detection brackets lock on (as on hover).
+        "group/card chamfer relative isolate grid overflow-hidden bg-bg-elevated [--cut:1.5rem] lg:grid-cols-12 xl:[--cut:2rem]",
         DECK_CARD_CLASS,
       )}
     >
@@ -45,7 +48,7 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
               href={`/work/${project.slug}`}
               prefetch={true}
               transitionTypes={["nav-forward"]}
-              className="block after:absolute after:inset-0 after:z-10 after:rounded-card focus-visible:outline-none"
+              className="block after:absolute after:inset-0 after:z-10 focus-visible:outline-none"
             >
               {/* Mask for the entrance slide; the padding keeps ascenders and descenders unclipped. */}
               <span className="-my-[0.12em] block overflow-y-clip py-[0.12em]">
@@ -120,7 +123,7 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
           {/* Visual-only affordance: the title link carries the name and the click. */}
           <span aria-hidden className="eyebrow flex shrink-0 items-center gap-2 text-fg">
             <span className="link-draw pb-0.5 group-hover/card:bg-size-[100%_1px] group-has-[a:focus-visible]/card:bg-size-[100%_1px]">
-              Read case study
+              <RollText>Read case study</RollText>
             </span>
             <span className="transition-transform duration-500 ease-out group-hover/card:translate-x-1 group-has-[a:focus-visible]/card:translate-x-1 motion-reduce:transition-none">
               →
@@ -133,7 +136,7 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
       <div
         aria-hidden
         className={cn(
-          "relative isolate order-first m-3 mb-0 aspect-4/3 overflow-hidden rounded-[calc(var(--radius-card)-0.75rem)] border border-line bg-bg-sunken md:aspect-video lg:order-none lg:col-span-6 lg:mb-3 lg:ml-0 lg:aspect-auto xl:col-span-7",
+          "chamfer relative isolate order-first m-3 mb-0 aspect-4/3 overflow-hidden bg-bg-sunken [--cut:1rem] md:aspect-video lg:order-none lg:col-span-6 lg:mb-3 lg:ml-0 lg:aspect-auto xl:col-span-7 xl:[--cut:1.375rem]",
           "max-lg:[@media(max-height:30rem)]:aspect-auto max-lg:[@media(max-height:30rem)]:h-[60svh]",
         )}
       >
@@ -142,6 +145,7 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
             <ProjectVisual visual={project.visual} variant="card" className="size-full" />
           </ViewTransition>
         </div>
+        <span className="chamfer-ring pointer-events-none absolute inset-0 bg-line" />
       </div>
 
       {/* Dims the card as the next one slides over it (deck scrub). */}
@@ -149,6 +153,15 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
         data-card-shade
         aria-hidden
         className="pointer-events-none absolute inset-0 z-20 bg-black opacity-0 light:bg-bg-sunken"
+      />
+      <span
+        aria-hidden
+        className="chamfer-ring pointer-events-none absolute inset-0 z-30 bg-line transition-colors duration-500 group-hover/card:bg-line-strong group-has-[a:focus-visible]/card:bg-accent-ink group-has-[a:focus-visible]/card:[--ring:2px]"
+      />
+      {/* The lock-on: accent brackets close in on hover and on keyboard focus. */}
+      <span
+        aria-hidden
+        className="detect-brackets pointer-events-none absolute inset-4 z-30 scale-[1.02] text-accent-ink opacity-0 transition-[opacity,scale] duration-500 ease-out [--arm:1.125rem] [--stroke:2px] group-hover/card:scale-100 group-hover/card:opacity-100 group-has-[a:focus-visible]/card:scale-100 group-has-[a:focus-visible]/card:opacity-100 motion-reduce:scale-100"
       />
     </article>
   );

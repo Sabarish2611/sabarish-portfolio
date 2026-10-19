@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { DecodeText } from "@/components/ui/decode-text";
 import { cn } from "@/lib/cn";
 
 // Both layers read the pointer position from --mx/--my, which BentoGrid sets on the hovered tile.
@@ -6,19 +7,16 @@ const SPOTLIGHT: CSSProperties = {
   background: "radial-gradient(34rem circle at var(--mx, 50%) var(--my, 0%), var(--spot), transparent 62%)",
 };
 
-// The hairline brightens near the pointer: a smaller gradient masked down to the 1px border ring.
+// The hairline brightens near the pointer: a smaller gradient painted only on the cut-corner ring.
 const RIM: CSSProperties = {
-  padding: 1,
   background: "radial-gradient(16rem circle at var(--mx, 50%) var(--my, 0%), var(--rim), transparent 70%)",
-  mask: "linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0)",
-  WebkitMask: "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
-  WebkitMaskComposite: "xor",
 };
 
 /**
- * One bento card: hairline border, elevated surface, mono eyebrow title (h3) and an optional
- * right-aligned meta. Content after the header is laid out in a flex column, so `mt-auto` on a
- * child pins it to the bottom edge.
+ * One bento card: cut corners with a hairline ring, elevated surface, mono eyebrow title (h3) and an
+ * optional right-aligned meta. On hover, neutral detection brackets lock on (the accent stays for
+ * actions). Content after the header is laid out in a flex column, so `mt-auto` on a child pins it
+ * to the bottom edge.
  */
 export function Tile({
   title,
@@ -38,7 +36,7 @@ export function Tile({
       data-tile=""
       data-reveal=""
       className={cn(
-        "group/tile relative isolate flex flex-col gap-8 rounded-card border border-line bg-bg-elevated p-6 transition-colors duration-500 ease-out hover:border-line-strong lg:p-8",
+        "group/tile chamfer relative isolate flex flex-col gap-8 bg-bg-elevated p-6 [--cut:1.25rem] lg:p-8 lg:[--cut:1.5rem]",
         // An ink haze in both themes: the accent is reserved for actions.
         "[--spot:color-mix(in_oklab,var(--fg)_5%,transparent)] [--rim:color-mix(in_oklab,var(--fg)_30%,transparent)]",
         className,
@@ -46,16 +44,26 @@ export function Tile({
     >
       <span
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 rounded-[inherit] opacity-0 transition-opacity duration-500 ease-out group-hover/tile:opacity-100"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 ease-out group-hover/tile:opacity-100"
         style={SPOTLIGHT}
       />
       <span
         aria-hidden
-        className="pointer-events-none absolute -inset-px -z-10 rounded-[inherit] opacity-0 transition-opacity duration-500 ease-out group-hover/tile:opacity-100"
+        className="chamfer-ring pointer-events-none absolute inset-0 z-10 bg-line transition-colors duration-500 ease-out group-hover/tile:bg-line-strong"
+      />
+      <span
+        aria-hidden
+        className="chamfer-ring pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-500 ease-out group-hover/tile:opacity-100"
         style={RIM}
       />
+      <span
+        aria-hidden
+        className="detect-brackets pointer-events-none absolute inset-3 z-10 scale-[1.02] text-fg-subtle opacity-0 transition-[opacity,scale] duration-500 ease-out group-hover/tile:scale-100 group-hover/tile:opacity-100 motion-reduce:scale-100"
+      />
       <div className={cn("flex items-center justify-between gap-4", headerClassName)}>
-        <h3 className="eyebrow text-fg-muted">{title}</h3>
+        <h3 className="eyebrow text-fg-muted">
+          <DecodeText>{title}</DecodeText>
+        </h3>
         {meta}
       </div>
       {children}
@@ -70,7 +78,7 @@ export function ChipList({ items, className }: { items: readonly string[]; class
       {items.map((item) => (
         <li
           key={item}
-          className="rounded-full border border-line px-3 py-1.5 text-sm text-fg"
+          className="chamfer-outline px-3 py-1.5 text-sm text-fg [--cut:0.375rem] [--outline:var(--line)]"
         >
           {item}
         </li>

@@ -15,11 +15,11 @@ const INTERACTIVE =
   "a[href],button:not(:disabled),[role=button],[role=link],[role=option],[role=tab],[role=switch],label,summary,select,input";
 
 const DOT_SPRING = { stiffness: 800, damping: 40, mass: 0.35 };
-/** Softer, so the big "View" disc trails the pointer a touch. */
+/** Softer, so the big "View" tag trails the pointer a touch. */
 const VIEW_SPRING = { stiffness: 350, damping: 34, mass: 0.6 };
 
 const SHAPE =
-  "absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 rounded-full transition-[opacity,scale] ease-out motion-reduce:transition-opacity motion-reduce:duration-150";
+  "absolute top-0 left-0 -translate-x-1/2 -translate-y-1/2 transition-[opacity,scale] ease-out motion-reduce:transition-opacity motion-reduce:duration-150";
 
 function resolveMode(target: EventTarget | null): Mode {
   if (!(target instanceof Element)) return "default";
@@ -30,8 +30,9 @@ function resolveMode(target: EventTarget | null): Mode {
 }
 
 /**
- * Pointer follower for mouse/trackpad users: a blend-mode dot that opens into a ring over anything
- * clickable and becomes a solid accent "View" disc over [data-cursor="view"]. Over text fields and
+ * Pointer follower for mouse/trackpad users: a blend-mode dot that opens into detection brackets
+ * (a reticle) over anything clickable and becomes a solid, cut-corner accent "View" tag over
+ * [data-cursor="view"]. Over text fields and
  * [data-cursor="hidden"] it hides and hands back the native cursor. Renders nothing on touch/server.
  * Mounted through <CursorLoader>, which also keeps it away from forced-colours/high-contrast users.
  */
@@ -128,34 +129,34 @@ export function Cursor() {
           <span
             className={cn(
               SHAPE,
-              "size-2.5 bg-white duration-300",
+              "size-2.5 rounded-full bg-white duration-300",
               shape === "default" ? "scale-100 opacity-100" : "scale-0 opacity-0",
             )}
           />
           <span
             className={cn(
               SHAPE,
-              "size-11 border border-white duration-300",
+              "detect-brackets size-11 text-white duration-300 [--arm:0.625rem]",
               shape === "link" ? "scale-100 opacity-100" : "scale-[0.23] opacity-0",
             )}
           />
         </div>
       </motion.div>
 
-      {/* Solid accent disc: a separate layer, so it never inherits the difference blend. */}
+      {/* Solid accent tag: a separate layer, so it never inherits the difference blend. The lift is a
+          drop-shadow on the layer, since a box-shadow would be clipped off the cut corners. */}
       <motion.div
         aria-hidden
         data-qa-hide
         data-cursor-root=""
-        className="pointer-events-none fixed top-0 left-0 z-(--z-cursor) will-change-transform"
+        className="pointer-events-none fixed top-0 left-0 z-(--z-cursor) drop-shadow-[0_12px_20px_rgb(0_0_0/0.4)] will-change-transform"
         style={{ x: reduce ? x : viewX, y: reduce ? y : viewY }}
       >
         <div className={press}>
           <span
             className={cn(
               SHAPE,
-              // Hairline + soft lift keep the disc legible even over accent-filled surfaces.
-              "eyebrow grid size-[5.75rem] place-items-center bg-accent text-on-accent shadow-[0_0_0_1px_rgb(0_0_0/0.14),0_12px_32px_-12px_rgb(0_0_0/0.5)] duration-500",
+              "chamfer eyebrow grid size-[5.25rem] place-items-center bg-accent text-on-accent duration-500 [--cut:1rem]",
               shape === "view" ? "scale-100 opacity-100" : "scale-[0.3] opacity-0",
             )}
           >

@@ -12,10 +12,11 @@ export function CaseStudyVisual({ project }: { project: Project }) {
     <figure aria-hidden className="container-page mt-[clamp(3rem,1.5rem+4vw,6rem)]">
       {/* Short screens (landscape phones) cap it so it never outgrows the viewport; svh is static,
           so the morph's landing spot stays put. */}
-      <div className="relative aspect-4/3 overflow-hidden rounded-card border border-line bg-bg-sunken md:aspect-video [@media(max-height:30rem)]:aspect-auto [@media(max-height:30rem)]:h-[60svh]">
+      <div className="chamfer relative aspect-4/3 overflow-hidden bg-bg-sunken [--cut:1.5rem] md:aspect-video xl:[--cut:2rem] [@media(max-height:30rem)]:aspect-auto [@media(max-height:30rem)]:h-[60svh]">
         <ViewTransition name={`project-visual-${project.slug}`} share="morph" default="none">
           <ProjectVisual visual={project.visual} variant="hero" className="size-full" />
         </ViewTransition>
+        <span aria-hidden className="chamfer-ring pointer-events-none absolute inset-0 bg-line" />
       </div>
       <figcaption data-cs-fade className="eyebrow mt-4 flex items-center justify-between gap-6 text-fg-muted">
         <span>

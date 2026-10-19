@@ -57,8 +57,8 @@ export function Toolkit() {
         <BentoGrid>
           <Tile title="Machine learning" className="md:col-span-6 lg:col-span-7 lg:row-span-2">
             <p className="max-w-[24ch] font-serif text-statement text-fg-muted">
-              <span className="text-fg">Transformers</span> to read endpoint behavior,{" "}
-              <span className="text-fg">gradient boosting</span> to classify it,{" "}
+              <span className="text-fg">Transformers</span> to read endpoint behavior{", "}
+              <span className="text-fg">gradient boosting</span> to classify it{", "}
               <span className="text-fg">autoencoders</span> to decide which alerts come first.
             </p>
             <div className="mt-auto flex flex-col gap-8">
@@ -102,9 +102,12 @@ export function Toolkit() {
 
           <Tile title="Explainability" className="md:col-span-6 lg:col-span-7">
             <p className="mt-auto max-w-[44ch] text-lead text-fg-muted">
-              <span className="text-fg">SHAP</span> to validate feature importance in a 60-category{" "}
-              <span className="text-fg">XGBoost</span> classifier.{" "}
-              <span className="text-fg">LLM-generated detection insights</span> with{" "}
+              <span className="text-fg">SHAP</span>
+              {" to validate feature importance in a 60-category "}
+              <span className="text-fg">XGBoost</span>
+              {" classifier. "}
+              <span className="text-fg">LLM-generated detection insights</span>
+              {" with "}
               <span className="text-fg">MITRE ATT&amp;CK</span> mappings.
             </p>
           </Tile>

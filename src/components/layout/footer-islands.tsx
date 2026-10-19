@@ -21,7 +21,7 @@ export function BackToTop() {
     <button
       type="button"
       onClick={handleClick}
-      className="eyebrow group inline-flex h-11 items-center gap-2.5 rounded-full border border-line-strong px-5 whitespace-nowrap text-fg transition-colors duration-300 hover:border-fg"
+      className="eyebrow group inline-flex h-11 chamfer-outline items-center gap-2.5 px-5 whitespace-nowrap text-fg hover:[--outline:var(--fg)]"
     >
       Back to top
       <span aria-hidden className="transition-[translate] duration-500 ease-out group-hover:-translate-y-0.5">

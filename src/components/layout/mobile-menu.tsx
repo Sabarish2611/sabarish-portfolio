@@ -28,7 +28,7 @@ export const MOBILE_MENU_ID = "mobile-menu";
 
 /** Shared by the header's Menu button and the overlay's Close button, which sits exactly on top of it. */
 export const MENU_BUTTON_CLASS =
-  "eyebrow flex h-10 w-[5.25rem] shrink-0 items-center justify-center rounded-full border border-line";
+  "eyebrow flex h-10 min-w-[5.25rem] shrink-0 chamfer-outline items-center justify-center px-3 [--outline:var(--line)]";
 
 /** Raw swatch colours: `--accent` only ever holds the active one. */
 export const ACCENT_SWATCHES: Record<Accent, { label: string; hex: string }> = {
@@ -372,7 +372,7 @@ function Swatch({ accent, active }: { accent: Accent; active: boolean }) {
       onClick={select}
       aria-pressed={active}
       aria-label={`${label} accent`}
-      className="grid size-10 place-items-center rounded-full border border-line transition-colors duration-300 hover:border-line-strong aria-pressed:border-fg"
+      className="grid size-10 chamfer-outline place-items-center [--cut:0.4rem] [--outline:var(--line)] hover:[--outline:var(--line-strong)] aria-pressed:[--outline:var(--fg)]"
     >
       <span className="size-4 rounded-full ring-1 ring-black/15 ring-inset" style={{ backgroundColor: hex }} />
     </button>

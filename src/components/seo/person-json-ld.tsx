@@ -1,3 +1,4 @@
+import portrait from "@/assets/photos/portrait.jpg";
 import { projects } from "@/content/projects";
 import { education, site, siteUrl, skillGroups } from "@/content/site";
 
@@ -20,6 +21,7 @@ export function PersonJsonLd() {
     "@id": `${url}#person`,
     name: site.name,
     url,
+    image: new URL(portrait.src, siteUrl).href,
     jobTitle: site.role,
     description: `${site.role} at ${site.company}, building production machine learning for cybersecurity.`,
     worksFor: { "@type": "Organization", name: site.company },

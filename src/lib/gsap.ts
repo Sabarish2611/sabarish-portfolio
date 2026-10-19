@@ -29,4 +29,15 @@ export const DURATION = {
   slower: 1.6,
 } as const;
 
+/**
+ * GSAP 3.15 workaround. A new ScrollTrigger force-refreshes the timeline-attached triggers still
+ * waiting for their first tick (the project cards' entrances), and the `once` ones that fire in
+ * that loop splice the array it is walking: a TypeError that takes the page down whenever it is set
+ * up scrolled past them (a /#contact link, a reload mid-page). Initialized in order first, they
+ * leave that loop nothing to do. Call before creating a `once` trigger.
+ */
+export function settlePendingTriggers() {
+  for (const trigger of ScrollTrigger.getAll()) if (!trigger.end) trigger.refresh();
+}
+
 export { gsap, ScrollTrigger, SplitText, useGSAP };

@@ -15,8 +15,8 @@ export function toggleMobileMenu() {
 /** Section anchors on the home page, in page order. */
 export const SECTIONS = [
   { id: "about", label: "About" },
-  { id: "work", label: "Work" },
   { id: "experience", label: "Experience" },
+  { id: "work", label: "Work" },
   { id: "toolkit", label: "Toolkit" },
   { id: "contact", label: "Contact" },
 ] as const;

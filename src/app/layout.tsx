@@ -35,7 +35,11 @@ export const metadata: Metadata = {
   keywords: [
     "Sabarishwaran G",
     "data scientist",
+    "AI engineer",
+    "forward deployed engineer",
     "machine learning",
+    "applied ML",
+    "agentic AI",
     "cybersecurity",
     "threat detection",
     "MLOps",

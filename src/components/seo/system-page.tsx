@@ -4,9 +4,9 @@ import { SignalTrace } from "./signal-trace";
 
 /** Pill CTAs, matching the hero's. */
 export const PILL_PRIMARY =
-  "group inline-flex h-12 items-center gap-3 rounded-full bg-accent px-6 font-medium text-on-accent";
+  "group inline-flex h-12 chamfer-fill items-center gap-3 px-6 font-medium text-on-accent [--cut:0.625rem]";
 export const PILL_SECONDARY =
-  "group inline-flex h-12 items-center gap-3 rounded-full border border-line-strong px-6 text-fg transition-colors duration-300 hover:border-fg";
+  "group inline-flex h-12 chamfer-outline items-center gap-3 px-6 text-fg [--cut:0.625rem] hover:[--outline:var(--fg)]";
 
 const HEADING =
   "mt-8 -ml-[0.04em] font-serif text-[length:clamp(3.75rem,1rem+12vw,12.5rem)] leading-[0.9] tracking-[-0.035em] md:mt-10";

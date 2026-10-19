@@ -15,8 +15,8 @@ export function ChipList({ items, tone = "muted", className, ...rest }: ChipList
         <li
           key={item}
           className={cn(
-            "eyebrow rounded-full border px-3.5 py-2",
-            tone === "strong" ? "border-line-strong text-fg" : "border-line text-fg-muted",
+            "eyebrow chamfer-outline px-3.5 py-2 [--cut:0.375rem]",
+            tone === "strong" ? "text-fg" : "text-fg-muted [--outline:var(--line)]",
           )}
         >
           {item}

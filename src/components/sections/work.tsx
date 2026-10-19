@@ -12,12 +12,15 @@ export function Work() {
     <section id="work" aria-labelledby="work-title" className="section-pad">
       <div className="container-page">
         <SectionHeader
-          index="02"
+          index="03"
           label="Selected work"
           headingId="work-title"
           heading={
             <>
-              Four systems, real numbers.
+              {"Four systems, "}
+              <span data-hl className="hl">
+                real numbers.
+              </span>
             </>
           }
           aside={

@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  // AVIF where the browser takes it (smoother on the photos' soft gradients), WebP otherwise.
+  images: { formats: ["image/avif", "image/webp"] },
   turbopack: {
     rules: {
       "*.css": {

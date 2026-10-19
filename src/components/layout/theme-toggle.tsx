@@ -26,7 +26,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label="Light theme"
       aria-pressed={theme === "light"}
       className={cn(
-        "relative grid size-10 place-items-center rounded-full border border-line text-fg transition-colors duration-300 hover:border-line-strong",
+        "grid size-10 chamfer-outline place-items-center text-fg transition-colors duration-300 [--cut:0.4rem] [--outline:var(--line)] hover:[--outline:var(--line-strong)]",
         className,
       )}
     >

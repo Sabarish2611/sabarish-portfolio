@@ -42,3 +42,6 @@ next-env.d.ts
 
 # visual QA output
 /qa-output
+
+# original personal photos (only optimized versions are committed)
+/photos-raw
