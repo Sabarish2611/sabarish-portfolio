@@ -30,7 +30,8 @@ export const site = {
   /** Not on the résumé: confirmed by Sabarish, who will work wherever a role needs. */
   openTo: "Relocation & travel",
   links: {
-    linkedin: "https://www.linkedin.com/in/sabarishwaran-g",
+    /** Confirmed by Sabarish (the earlier /in/sabarishwaran-g was wrong). */
+    linkedin: "https://www.linkedin.com/in/sabarish2611/",
     resume: "/Sabarishwaran_G_Resume.pdf",
   },
 } as const;

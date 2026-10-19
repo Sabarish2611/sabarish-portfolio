@@ -13,8 +13,8 @@ import { DURATION, EASE, gsap, settlePendingTriggers, useGSAP } from "@/lib/gsap
 const MAILTO = `mailto:${site.email}`;
 // The address is long: narrow columns break it before the "@" rather than overflow.
 const [EMAIL_USER, EMAIL_DOMAIN] = site.email.split("@");
-/** "linkedin.com/in/sabarishwaran-g": the profile URL without its scheme. */
-const LINKEDIN_LABEL = site.links.linkedin.replace(/^https?:\/\/(www\.)?/, "");
+/** "linkedin.com/in/sabarish2611": the profile URL without its scheme, "www." or trailing slash. */
+const LINKEDIN_LABEL = site.links.linkedin.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
 
 const LINK = "link-draw bg-origin-content py-[max(0px,calc((2.75rem_-_1lh)/2))]";
 
