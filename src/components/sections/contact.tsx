@@ -19,14 +19,16 @@ const LINKEDIN_LABEL = site.links.linkedin.replace(/^https?:\/\/(www\.)?/, "");
 const LINK = "link-draw bg-origin-content py-[max(0px,calc((2.75rem_-_1lh)/2))]";
 
 /**
- * One label/value row. The hairline above it is a ::before scaled by --rule, so the entrance can draw
- * it without an extra element (a <dl> row may hold only its dt and dd).
+ * One label/value row. The hairline above it is a ::before scaled by --rule (the last row's ::after
+ * closes the list), so the entrance can draw them without extra elements: a <dl> row may hold only
+ * its dt and dd. The row starts hidden (data-reveal) until the entrance has set its lines to zero.
  */
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div
       data-contact-row
-      className="relative grid gap-1.5 py-[clamp(0.875rem,2svh,1.25rem)] [--rule:1] before:absolute before:inset-x-0 before:top-0 before:h-px before:origin-left before:scale-x-(--rule) before:bg-line lg:grid-cols-[8.5rem_1fr] lg:items-center lg:gap-6"
+      data-reveal
+      className="relative grid gap-1.5 py-[clamp(0.875rem,2svh,1.25rem)] [--rule:1] before:absolute before:inset-x-0 before:top-0 before:h-px before:origin-left before:scale-x-(--rule) before:bg-line last:after:absolute last:after:inset-x-0 last:after:bottom-0 last:after:h-px last:after:origin-left last:after:scale-x-(--rule) last:after:bg-line lg:grid-cols-[8.5rem_1fr] lg:items-center lg:gap-6"
     >
       <dt data-contact-item data-reveal className="eyebrow text-fg-muted">
         {label}
@@ -56,7 +58,7 @@ export function Contact() {
       const mm = gsap.matchMedia();
 
       mm.add("(prefers-reduced-motion: reduce)", () => {
-        gsap.set(items, { autoAlpha: 1 });
+        gsap.set([...rows, ...items], { autoAlpha: 1 });
       });
 
       mm.add("(prefers-reduced-motion: no-preference)", () => {
@@ -72,6 +74,9 @@ export function Contact() {
             { autoAlpha: 1, y: 0, duration: DURATION.base, ease: EASE.out, stagger: 0.04 },
             0.2,
           );
+        // The fromTo above has already zeroed the lines, so the rows can show without a flash of
+        // fully drawn lines (a /#contact link lands here before the entrance starts).
+        gsap.set(rows, { autoAlpha: 1 });
       });
     },
     { scope: root },
@@ -95,7 +100,8 @@ export function Contact() {
         <RevealImage
           src={boatRail}
           alt={`${site.name} leaning on a boat's rail, looking out over the water`}
-          sizes="(min-width: 1600px) 520px, (min-width: 768px) 36vw, (min-width: 640px) 58vw, 84vw"
+          // RevealImage draws the photo 1.16x the card's width (its drift overscan).
+          sizes="(min-width: 1600px) 600px, (min-width: 768px) 42vw, (min-width: 640px) 68vw, 98vw"
           className="col-span-10 aspect-3/4 w-full [--cut:1rem] [--grain:0.12] sm:col-span-7 md:col-span-5 md:row-start-2 md:max-w-[48svh] lg:[--cut:1.5rem]"
         />
 
@@ -111,7 +117,7 @@ export function Contact() {
             </span>
           </RevealText>
 
-          <dl className="border-b border-line">
+          <dl>
             <Row label="Email">
               {/* The label keeps the accessible name exact: Chrome reads the <wbr> as a space. */}
               <a
@@ -154,6 +160,7 @@ export function Contact() {
                 >
                   ↓
                 </span>
+                <span className="sr-only"> (résumé)</span>
               </a>
             </Row>
             <Row label="Based in">

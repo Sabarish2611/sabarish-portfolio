@@ -14,7 +14,6 @@
  *
  * The committed assets were made with:
  *   node scripts/grade-photo.mjs photos-raw/IMG_1597.heic src/assets/photos/portrait.jpg         0    0 2268 3780 1400 84 mono
- *   node scripts/grade-photo.mjs photos-raw/IMG_1597.heic src/assets/photos/portrait-face.jpg  661  964 1500 1500  640
  *   node scripts/grade-photo.mjs photos-raw/IMG_1597.heic src/assets/photos/og-portrait.jpg    430  650 1838 2939  324 86
  *   node scripts/grade-photo.mjs photos-raw/IMG_1616.HEIC src/assets/photos/boat-rail.jpg        0  950 3213 4284 1400 84 mono
  */
