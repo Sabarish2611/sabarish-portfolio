@@ -3,7 +3,7 @@
 import { useMemo, useRef } from "react";
 import { EASE, gsap, useGSAP } from "@/lib/gsap";
 import { laneD, layoutCategories, SCRIPTS, streamFrame, type CategoriesLayout, type StreamFrame } from "./categories-layout";
-import { bindPlayback, MicroLabel, r1, useFrameSize, VisualFrame, type Playback, type Variant } from "./shared";
+import { MicroLabel, playWithMotion, r1, useFrameSize, VisualFrame, type Playback, type Variant } from "./shared";
 
 const INTRO_END = 1.6;
 const fixed = (value: number) => value.toFixed(3);
@@ -21,13 +21,10 @@ export function CategoriesVisual({ variant, className }: { variant: Variant; cla
   const still = useMemo(() => (layout ? streamFrame(layout, 0) : null), [layout]);
 
   useGSAP(
-    () => {
+    (context) => {
       const el = root.current;
       if (!el || !layout) return;
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", (context) =>
-        bindPlayback(el, context, () => categoriesTimeline(el, layout), played),
-      );
+      return playWithMotion(context, el, () => categoriesTimeline(el, layout), played);
     },
     { scope: root, dependencies: [layout], revertOnUpdate: true },
   );

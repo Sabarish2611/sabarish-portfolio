@@ -4,9 +4,9 @@ import { useId, useMemo, useRef } from "react";
 import { EASE, gsap, useGSAP } from "@/lib/gsap";
 import { layoutClusters, type ClusterDot, type ClustersLayout } from "./clusters-layout";
 import {
-  bindPlayback,
   clamp,
   MicroLabel,
+  playWithMotion,
   r1,
   randomStagger,
   samplePath,
@@ -48,13 +48,10 @@ export function ClustersVisual({ variant, className }: { variant: Variant; class
   const gridId = `clusters-grid-${useId().replace(/[^\w-]/g, "")}`;
 
   useGSAP(
-    () => {
+    (context) => {
       const el = root.current;
       if (!el || !layout) return;
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", (context) =>
-        bindPlayback(el, context, () => clustersTimeline(el, layout), played),
-      );
+      return playWithMotion(context, el, () => clustersTimeline(el, layout), played);
     },
     { scope: root, dependencies: [layout], revertOnUpdate: true },
   );

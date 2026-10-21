@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode, type Ref, type RefObject, type SVGProps } from "react";
 import { cn } from "@/lib/cn";
+import { gsap } from "@/lib/gsap";
 import { onIntroReveal } from "@/lib/intro";
 
 export type Variant = "card" | "hero";
@@ -297,8 +298,7 @@ function isNear(el: Element) {
  * so it also works inside pinned or horizontal scrollers: the intro starts once 20% of the frame
  * is visible and the loop pauses when the frame is fully off screen — or when another deck card
  * has landed on it (project-deck.tsx sets `data-covered` on the card). After a rebuild (resize,
- * route re-shown) the intro is skipped. Call inside a gsap.matchMedia() handler and return the
- * result as its cleanup.
+ * route re-shown) the intro is skipped. Visuals reach it through playWithMotion.
  */
 export function bindPlayback(
   trigger: Element,
@@ -377,4 +377,25 @@ export function bindPlayback(
     stopReveal();
     playback?.reset?.();
   };
+}
+
+/**
+ * A visual's playback (bindPlayback) whenever motion is allowed: call it inside useGSAP and return
+ * the result. The matchMedia lives outside useGSAP's context on purpose. Nested in it, a route
+ * hidden by React Activity (cacheComponents) reverts the handler's context twice, and GSAP's
+ * second pass re-applies the start values of fromTo tweens (opacity 0 on lit states), leaving the
+ * settled frame broken until the visual remounts. Selectors inside stay scoped to `trigger`.
+ */
+export function playWithMotion(
+  context: gsap.Context,
+  trigger: HTMLElement,
+  build: () => Playback,
+  played: { current: boolean },
+) {
+  let mm: gsap.MatchMedia | undefined;
+  context.ignore(() => {
+    mm = gsap.matchMedia(trigger);
+    mm.add("(prefers-reduced-motion: no-preference)", (handler) => bindPlayback(trigger, handler, build, played));
+  });
+  return () => mm?.revert();
 }

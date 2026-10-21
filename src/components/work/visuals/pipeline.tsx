@@ -4,10 +4,10 @@ import { useId, useMemo, useRef } from "react";
 import { EASE, gsap, useGSAP } from "@/lib/gsap";
 import { layoutPipeline, NODE_R, STILL_STAGE, type Label, type PipelineLayout } from "./pipeline-layout";
 import {
-  bindPlayback,
   clamp,
   Lattice,
   MicroLabel,
+  playWithMotion,
   r1,
   samplePath,
   STROKE,
@@ -31,13 +31,10 @@ export function PipelineVisual({ variant, className }: { variant: Variant; class
   const maskId = `pipeline-mask-${useId().replace(/[^\w-]/g, "")}`;
 
   useGSAP(
-    () => {
+    (context) => {
       const el = root.current;
       if (!el || !layout) return;
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", (context) =>
-        bindPlayback(el, context, () => pipelineTimeline(el, layout), played),
-      );
+      return playWithMotion(context, el, () => pipelineTimeline(el, layout), played);
     },
     { scope: root, dependencies: [layout], revertOnUpdate: true },
   );

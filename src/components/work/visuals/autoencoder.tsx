@@ -4,9 +4,9 @@ import { useMemo, useRef } from "react";
 import { EASE, gsap, useGSAP } from "@/lib/gsap";
 import { HOLD, layoutAutoencoder, type AutoencoderLayout } from "./autoencoder-layout";
 import {
-  bindPlayback,
   clamp,
   MicroLabel,
+  playWithMotion,
   pointOnRoute,
   r1,
   useFrameSize,
@@ -28,13 +28,10 @@ export function AutoencoderVisual({ variant, className }: { variant: Variant; cl
   const layout = useMemo(() => (size ? layoutAutoencoder(size, variant) : null), [size, variant]);
 
   useGSAP(
-    () => {
+    (context) => {
       const el = root.current;
       if (!el || !layout) return;
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", (context) =>
-        bindPlayback(el, context, () => autoencoderTimeline(el, layout), played),
-      );
+      return playWithMotion(context, el, () => autoencoderTimeline(el, layout), played);
     },
     { scope: root, dependencies: [layout], revertOnUpdate: true },
   );
