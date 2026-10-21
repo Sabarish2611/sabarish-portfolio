@@ -16,7 +16,7 @@ export const site = {
   monogram: "SG",
   role: "Data Scientist",
   company: "Trellix",
-  /** Current address, confirmed by Sabarish; the résumé PDF still lists an older one until it's updated. */
+  /** Confirmed by Sabarish; the résumé lists the same address. */
   email: "sabarishwaran.ganesan@gmail.com",
   location: {
     city: "Trichy",
@@ -30,7 +30,7 @@ export const site = {
   /** Not on the résumé: confirmed by Sabarish, who will work wherever a role needs. */
   openTo: "Relocation & travel",
   links: {
-    /** Confirmed by Sabarish (the earlier /in/sabarishwaran-g was wrong). */
+    /** Confirmed by Sabarish, and the résumé links the same profile (the earlier /in/sabarishwaran-g was wrong). */
     linkedin: "https://www.linkedin.com/in/sabarish2611/",
     resume: "/Sabarishwaran_G_Resume.pdf",
   },
@@ -38,28 +38,61 @@ export const site = {
 
 export type SkillGroup = { label: string; items: readonly string[] };
 
+/**
+ * The résumé's skill groups, in its order and with its labels. Parentheticals are flattened into items
+ * ("SQL (MySQL, PostgreSQL, BigQuery)" → SQL, MySQL, PostgreSQL, BigQuery), and a skill the résumé lists
+ * under two groups is in both (BigQuery: SQL and GCP).
+ */
 export const skillGroups: readonly SkillGroup[] = [
   {
-    label: "Machine learning & AI",
+    label: "Languages & Tools",
+    items: ["Python", "SQL", "MySQL", "PostgreSQL", "BigQuery", "Cypher", "Bash", "Git", "REST APIs", "Flask"],
+  },
+  {
+    label: "Generative & Agentic AI",
     items: [
-      "Machine Learning",
+      "LLMs",
+      "Claude",
+      "AWS Bedrock",
+      "Multi-Agent Systems",
+      "LangGraph",
+      "LangChain",
+      "Tool Calling",
+      "RAG",
+      "GraphRAG",
+      "Vector Search",
+      "Human-in-the-Loop",
+      "LLM-as-Judge",
+      "Prompt Engineering",
+    ],
+  },
+  {
+    label: "Machine Learning & AI",
+    items: [
       "Deep Learning",
       "Transformers",
       "Autoencoders",
       "NLP",
       "Computer Vision",
       "Reinforcement Learning",
-      "LLMs",
       "LightGBM",
       "XGBoost",
       "PyTorch",
       "Scikit-learn",
+      "SHAP",
+      "Statistical Modeling",
+      "A/B Testing",
     ],
+  },
+  {
+    label: "Data & Visualization",
+    items: ["PySpark", "Apache Arrow", "EDA", "Feature Engineering", "Matplotlib", "Seaborn", "Plotly"],
   },
   {
     label: "Cloud & MLOps",
     items: [
       "AWS SageMaker",
+      "AWS Lambda",
       "EC2",
       "S3",
       "EMR",
@@ -72,26 +105,9 @@ export const skillGroups: readonly SkillGroup[] = [
       "IAM",
       "Kubeflow Pipelines",
       "Terraform",
+      "Docker",
     ],
   },
-  { label: "Big data", items: ["PySpark", "AWS EMR", "BigQuery Storage API", "Apache Arrow"] },
-  {
-    label: "Statistics & analysis",
-    items: [
-      "SHAP",
-      "Statistical Modeling",
-      "Linear Algebra",
-      "A/B Testing",
-      "Exploratory Data Analysis",
-      "Data Wrangling",
-      "Feature Engineering",
-    ],
-  },
-  {
-    label: "Languages & tools",
-    items: ["Python", "SQL", "MySQL", "BigQuery", "Git", "GitHub", "Docker", "REST APIs", "Bash"],
-  },
-  { label: "Visualization", items: ["Matplotlib", "Seaborn", "Plotly"] },
 ];
 
 /**
@@ -99,19 +115,24 @@ export const skillGroups: readonly SkillGroup[] = [
  * on its first line; every other skill is a tool, on the second line with its logo where it has one.
  */
 export const methodSkills: readonly string[] = [
-  "Machine Learning",
+  "LLMs",
+  "Multi-Agent Systems",
+  "Tool Calling",
+  "RAG",
+  "GraphRAG",
+  "Vector Search",
+  "Human-in-the-Loop",
+  "LLM-as-Judge",
+  "Prompt Engineering",
   "Deep Learning",
   "Transformers",
   "Autoencoders",
   "NLP",
   "Computer Vision",
   "Reinforcement Learning",
-  "LLMs",
   "Statistical Modeling",
-  "Linear Algebra",
   "A/B Testing",
-  "Exploratory Data Analysis",
-  "Data Wrangling",
+  "EDA",
   "Feature Engineering",
 ];
 
@@ -138,8 +159,8 @@ export const experience: readonly Role[] = [
     startISO: "2023-07",
     place: "Bangalore",
     summary:
-      "Production ML for endpoint security — threat detection on EDR telemetry, an end-to-end MLOps pipeline for malware classification on GCP, and autoencoder-based alert prioritization for the SOC.",
-    projects: ["edr-threat-detection", "malware-mlops-pipeline", "alert-prioritization"],
+      "ML and LLM systems for security — STREAM, a multi-agent LLM system that triages and investigates security escalations; threat detection on EDR telemetry; an end-to-end MLOps pipeline for malware classification on GCP; and autoencoder-based alert prioritization for the SOC.",
+    projects: ["stream", "edr-threat-detection", "malware-mlops-pipeline", "alert-prioritization"],
   },
   {
     title: "Data Science Intern",
@@ -150,7 +171,7 @@ export const experience: readonly Role[] = [
     endISO: "2023-06",
     place: "Bangalore",
     summary:
-      "Built an automated URL categorization pipeline with multilingual transformer embeddings, XGBoost, and SHAP-based interpretation.",
+      "Built an NLP-based URL categorization pipeline with multilingual XLM transformer embeddings and XGBoost, reaching 76% accuracy across 60 categories, and used SHAP for interpretability.",
     projects: ["url-categorization"],
   },
 ];

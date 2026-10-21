@@ -3,8 +3,8 @@ import { projects } from "@/content/projects";
 import { education, site, siteUrl, skillGroups } from "@/content/site";
 
 // Picked by name, so only terms that exist in the content files are ever emitted.
-const TOP_SKILLS = ["Machine Learning", "Deep Learning", "NLP", "Transformers", "LLMs", "PyTorch", "LightGBM"];
-const TOP_DOMAINS = ["Threat detection", "Anomaly detection", "MLOps"];
+const TOP_SKILLS = ["Multi-Agent Systems", "LLMs", "Deep Learning", "NLP", "Transformers", "PyTorch", "LightGBM"];
+const TOP_DOMAINS = ["Agentic AI", "Threat detection", "Anomaly detection", "MLOps"];
 
 const skills = new Set(skillGroups.flatMap((group) => group.items));
 const domains = new Set(projects.flatMap((project) => project.domains));

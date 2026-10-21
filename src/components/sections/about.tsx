@@ -39,7 +39,7 @@ const STATEMENT = (
 );
 
 /** The tools line opens with the languages, the most recognisable logos; the other groups keep their order. */
-const LEAD_GROUP = "Languages & tools";
+const LEAD_GROUP = "Languages & Tools";
 
 /** Every skill once ("AWS EMR" = "EMR"), in group order. */
 const SKILLS = [

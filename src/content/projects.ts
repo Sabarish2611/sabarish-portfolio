@@ -12,7 +12,7 @@ export type Metric = {
 
 export type ApproachStep = { title: string; body: string };
 
-export type ProjectVisual = "clusters" | "pipeline" | "autoencoder" | "categories";
+export type ProjectVisual = "clusters" | "pipeline" | "autoencoder" | "categories" | "agents";
 
 export type Project = {
   slug: string;
@@ -37,8 +37,54 @@ export type Project = {
 
 export const projects: readonly Project[] = [
   {
-    slug: "edr-threat-detection",
+    slug: "stream",
     index: "01",
+    title: "STREAM: LLM agents for security escalations",
+    shortTitle: "STREAM escalation agents",
+    oneLiner:
+      "A multi-agent LLM system that triages and investigates security escalations from Jira, then proposes a resolution or hands off to an analyst.",
+    role: "Data Scientist",
+    org: "Trellix",
+    domains: ["Agentic AI", "Human-in-the-loop", "GraphRAG"],
+    problem:
+      "Every customer security escalation that lands in Jira has to be triaged, investigated, and either resolved or handed to an analyst — and LLM agents doing that work need guardrails.",
+    approach: [
+      {
+        title: "Orchestrate and delegate",
+        body: "LLM agents investigate each escalation: a LangGraph orchestrator agent, running on Claude, delegates to product-specific sub-agents.",
+      },
+      {
+        title: "Triage and dedup",
+        body: "Hybrid triage runs on regex with an LLM fallback, and duplicate tickets are caught with vector search, reciprocal rank fusion (RRF), and an LLM-as-judge.",
+      },
+      {
+        title: "Context from a knowledge graph",
+        body: "Tickets and indicators are modeled as a Neo4j knowledge graph with vector search, which gives the agents GraphRAG context.",
+      },
+      {
+        title: "Guardrails by design",
+        body: "Read-only agent tools, deterministic Jira actions, confidence gating, and LLM cost budgets keep the agents within bounds.",
+      },
+      {
+        title: "A durable human in the loop",
+        body: "When an escalation goes to an analyst, LangGraph interrupts pause the run and Postgres checkpoints hold its state, so it resumes on the analyst’s reply.",
+      },
+    ],
+    // The résumé gives no figures for this project, so its results are the design's own terms. Values
+    // after the first stay short (six characters or so): they share a two-column row on phones.
+    metrics: [
+      { value: "HITL", label: "Durable analyst review" },
+      { value: "Neo4j", label: "Knowledge graph for GraphRAG" },
+      { value: "Claude", label: "LangGraph orchestrator agent" },
+    ],
+    outcome:
+      "Customer escalations go from Jira to a proposed resolution or an analyst hand-off — investigated by LLM agents within guardrails, with a durable human in the loop.",
+    stack: ["Python", "LangGraph", "LangChain", "Claude", "AWS Bedrock", "Neo4j", "PostgreSQL", "LangSmith", "GCP"],
+    visual: "agents",
+  },
+  {
+    slug: "edr-threat-detection",
+    index: "02",
     title: "ML-powered threat detection for EDR",
     shortTitle: "EDR threat detection",
     oneLiner:
@@ -79,7 +125,7 @@ export const projects: readonly Project[] = [
   },
   {
     slug: "malware-mlops-pipeline",
-    index: "02",
+    index: "03",
     title: "End-to-end MLOps for malware classification",
     shortTitle: "Malware MLOps pipeline",
     oneLiner:
@@ -121,13 +167,15 @@ export const projects: readonly Project[] = [
       "A production pipeline I owned end to end: six conflicting label feeds in, a classifier retrained every day out — reproducible from Terraform and config.",
     stack: [
       "Python",
+      // "(GPU/OpenCL)" on the résumé; shortened so the card's three-tool stack line stays within two lines.
       "LightGBM (GPU)",
       "Vertex AI",
-      "Kubeflow Pipelines",
       "BigQuery",
       "Cloud Run",
       "GCS",
       "Cloud Scheduler",
+      "IAM",
+      "Kubeflow Pipelines",
       "Terraform",
       "Docker",
       "Apache Arrow",
@@ -136,7 +184,7 @@ export const projects: readonly Project[] = [
   },
   {
     slug: "alert-prioritization",
-    index: "03",
+    index: "04",
     title: "Autoencoder alert prioritization",
     shortTitle: "Alert prioritization",
     oneLiner:
@@ -165,31 +213,27 @@ export const projects: readonly Project[] = [
       { value: "94.5%", label: "Reduction in alert fatigue" },
     ],
     outcome:
-      "False positives fell from 70% to 30% and alert fatigue dropped by 94.5%, significantly improving SOC efficiency.",
-    stack: ["Python", "PyTorch", "Scikit-learn", "Autoencoders", "PySpark", "AWS SageMaker", "EMR", "Athena", "EC2", "S3"],
+      "False positives fell from 70% to 30% and alert fatigue dropped by 94.5%, improving SOC efficiency.",
+    stack: ["Python", "PyTorch", "Scikit-learn", "PySpark", "Git", "AWS EC2", "SageMaker", "S3", "EMR", "Athena"],
     visual: "autoencoder",
   },
   {
     slug: "url-categorization",
-    index: "04",
+    index: "05",
     title: "Multilingual URL categorization",
     shortTitle: "URL categorization",
     oneLiner:
-      "An automated pipeline that reads web content in many languages and sorts URLs into 60 categories.",
+      "An NLP pipeline that sorts URLs into 60 categories, using multilingual XLM transformer embeddings and XGBoost.",
     role: "Data Science Intern",
     org: "Trellix",
     period: "Mar–Jun 2023",
     domains: ["NLP", "Multilingual", "Explainability"],
     problem:
-      "To categorize a URL you have to understand what its page says — and the web isn’t written in one language.",
+      "Sorting URLs into 60 categories means understanding text in many languages — the web isn’t written in one.",
     approach: [
       {
-        title: "Read the page",
-        body: "Analyzed each URL’s page content with NLP.",
-      },
-      {
         title: "Embed across languages",
-        body: "Generated multilingual embeddings with XLM transformers.",
+        body: "Built an NLP pipeline that turns each URL into multilingual XLM transformer embeddings.",
       },
       {
         title: "Classify",
@@ -197,6 +241,7 @@ export const projects: readonly Project[] = [
       },
       {
         title: "Explain",
+        // "Validate feature importance" isn't on the new résumé: kept, confirmed by Sabarish.
         body: "Used SHAP to interpret predictions and validate feature importance.",
       },
     ],
@@ -205,7 +250,7 @@ export const projects: readonly Project[] = [
       { value: "60", label: "Categories" },
     ],
     outcome:
-      "An automated, explainable categorization pipeline that works across languages — built during my internship.",
+      "An explainable categorization pipeline that works across languages — built during my internship.",
     stack: ["Python", "XLM Transformers", "XGBoost", "SHAP", "NLP"],
     visual: "categories",
   },

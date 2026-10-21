@@ -1,4 +1,5 @@
 import type { ProjectVisual as ProjectVisualKind } from "@/content/projects";
+import { AgentsVisual } from "./agents";
 import { AutoencoderVisual } from "./autoencoder";
 import { CategoriesVisual } from "./categories";
 import { ClustersVisual } from "./clusters";
@@ -25,5 +26,7 @@ export function ProjectVisual({ visual, variant = "card", className }: ProjectVi
       return <AutoencoderVisual variant={variant} className={className} />;
     case "categories":
       return <CategoriesVisual variant={variant} className={className} />;
+    case "agents":
+      return <AgentsVisual variant={variant} className={className} />;
   }
 }
