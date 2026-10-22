@@ -1,3 +1,5 @@
+import { site } from "@/content/site";
+
 export type Theme = "dark" | "light";
 export type Accent = "lime" | "orange";
 
@@ -15,13 +17,26 @@ export const STORAGE_KEYS = {
 } as const;
 
 /**
+ * getTimezoneOffset() of a visitor whose clock reads the same as Sabarish's: minutes behind UTC, so
+ * UTC+5:30 is -330. From site.location.utcOffset; valid because IST has no daylight saving.
+ */
+const HOME_CLOCK_OFFSET = (() => {
+  const match = /^UTC([+-])(\d{1,2})(?::(\d{2}))?$/.exec(site.location.utcOffset);
+  if (!match) throw new Error(`preferences: can't read the UTC offset "${site.location.utcOffset}".`);
+  const minutes = Number(match[2]) * 60 + Number(match[3] ?? 0);
+  return match[1] === "+" ? -minutes : minutes;
+})();
+
+/**
  * Runs in <head> before first paint so the page never flashes the wrong theme or accent.
  * The intro only plays on a first visit that lands on the home page — deep links (a shared case
  * study) open straight onto their content. `data-js` is set last: content that waits for an
  * entrance animation is only hidden when this script actually ran, so the site stays fully
- * readable without JavaScript.
+ * readable without JavaScript. `data-clock` says whether the visitor's clock reads the same as the
+ * one where Sabarish is based ("same") or not ("other"), so Contact shows one line or its two clocks
+ * from the first frame instead of changing height once it hydrates.
  */
-export const PREFERENCES_SCRIPT = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${STORAGE_KEYS.theme}"),a=localStorage.getItem("${STORAGE_KEYS.accent}");d.dataset.theme=t==="light"?"light":"dark";d.dataset.accent=a==="orange"?"orange":"lime";if(location.pathname!=="/"||sessionStorage.getItem("${STORAGE_KEYS.intro}")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.dataset.intro="skip";d.dataset.js="";}catch(e){}})();`;
+export const PREFERENCES_SCRIPT = `(function(){try{var d=document.documentElement,t=localStorage.getItem("${STORAGE_KEYS.theme}"),a=localStorage.getItem("${STORAGE_KEYS.accent}");d.dataset.theme=t==="light"?"light":"dark";d.dataset.accent=a==="orange"?"orange":"lime";if(location.pathname!=="/"||sessionStorage.getItem("${STORAGE_KEYS.intro}")||matchMedia("(prefers-reduced-motion: reduce)").matches)d.dataset.intro="skip";d.dataset.clock=new Date().getTimezoneOffset()===${HOME_CLOCK_OFFSET}?"same":"other";d.dataset.js="";}catch(e){}})();`;
 
 type Origin = { x: number; y: number };
 
