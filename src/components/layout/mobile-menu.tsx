@@ -325,6 +325,9 @@ function MenuFooter() {
           <ExternalLink href={site.links.linkedin}>LinkedIn</ExternalLink>
         </li>
         <li>
+          <ExternalLink href={site.links.github}>GitHub</ExternalLink>
+        </li>
+        <li>
           <ExternalLink href={site.links.resume}>Résumé</ExternalLink>
         </li>
       </ul>
@@ -353,7 +356,7 @@ function MenuFooter() {
 function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noopener noreferrer" className="group relative inline-flex h-10 items-center gap-2 after:absolute after:-inset-y-0.5 after:inset-x-0">
-      <span className="link-draw">{children}</span>
+      <span className="link-draw group-hover:bg-size-[100%_1px] group-focus-visible:bg-size-[100%_1px]">{children}</span>
       <span
         aria-hidden
         className="text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-ink"

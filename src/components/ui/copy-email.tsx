@@ -35,11 +35,11 @@ function createBurst(id: number, width: number, height: number): Burst {
   return { id, particles, last };
 }
 
-function CopyIcon() {
+function MailIcon() {
   return (
     <svg aria-hidden viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.4} className="size-3.5 shrink-0">
-      <rect x="5.25" y="5.25" width="8.5" height="8.5" rx="1.75" />
-      <path d="M10.75 5.25V3.5A1.25 1.25 0 0 0 9.5 2.25h-6A1.25 1.25 0 0 0 2.25 3.5v6a1.25 1.25 0 0 0 1.25 1.25h1.75" />
+      <rect x="1.75" y="3.25" width="12.5" height="9.5" rx="1.75" />
+      <path d="m2.5 4.75 5.5 4 5.5-4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -53,8 +53,8 @@ function CheckIcon() {
 }
 
 /**
- * "Copy" pill for the email address: label swap, a small accent burst on success and a polite
- * screen-reader announcement. If the Clipboard API is unavailable or refuses, it opens the mail
+ * "Copy email" pill for the address, with the envelope as the email's mark among Contact's links:
+ * label swap, a small accent burst on success and a polite screen-reader announcement. If the Clipboard API is unavailable or refuses, it opens the mail
  * client instead so the click is never a dead end.
  */
 export function CopyEmail({ email, className }: { email: string; className?: string }) {
@@ -113,8 +113,8 @@ export function CopyEmail({ email, className }: { email: string; className?: str
         <span aria-hidden className="relative grid overflow-hidden py-1">
           {/* Sizer: the pill keeps the width of its longest label, so the swap never reflows the row. */}
           <span className="invisible col-start-1 row-start-1 flex items-center justify-self-center gap-2">
-            <CheckIcon />
-            Copied
+            <MailIcon />
+            Copy email
           </span>
           <AnimatePresence initial={false}>
             <motion.span
@@ -125,8 +125,8 @@ export function CopyEmail({ email, className }: { email: string; className?: str
               exit={{ y: "-110%", opacity: 0 }}
               transition={LABEL_SPRING}
             >
-              {copied ? <CheckIcon /> : <CopyIcon />}
-              {copied ? "Copied" : "Copy"}
+              {copied ? <CheckIcon /> : <MailIcon />}
+              {copied ? "Copied" : "Copy email"}
             </motion.span>
           </AnimatePresence>
         </span>

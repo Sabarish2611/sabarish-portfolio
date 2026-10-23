@@ -73,7 +73,6 @@ const ICONS = {
   sun: "M8 10.75a2.75 2.75 0 1 0 0-5.5 2.75 2.75 0 0 0 0 5.5ZM8 1.25v1.5M8 13.25v1.5M3.23 3.23l1.06 1.06M11.71 11.71l1.06 1.06M1.25 8h1.5M13.25 8h1.5M3.23 12.77l1.06-1.06M11.71 4.29l1.06-1.06",
   copy: "M5.5 5.5h7.25v7.25H5.5zM10.5 5.5V3.25H3.25v7.25H5.5",
   external: "M5 11 11 5M5.75 5H11v5.25",
-  download: "M8 2.25v8.5M4.5 7.25 8 10.75l3.5-3.5M2.75 13.75h10.5",
   check: "M3 8.5 6.5 12 13 4.5",
 } as const;
 
@@ -401,20 +400,11 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     afterClose(() => showToast("Email copied to clipboard"));
   }
 
-  function openLinkedIn() {
+  function openInNewTab(url: string) {
     onOpenChange(false);
-    window.open(site.links.linkedin, "_blank", "noopener,noreferrer");
+    window.open(url, "_blank", "noopener,noreferrer");
   }
 
-  function downloadResume() {
-    onOpenChange(false);
-    const link = document.createElement("a");
-    link.href = site.links.resume;
-    link.download = "";
-    document.body.append(link);
-    link.click();
-    link.remove();
-  }
 
   const groups: PaletteGroup[] = [
     {
@@ -481,8 +471,30 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
           hint: <span className="tracking-normal normal-case max-sm:hidden">{site.email}</span>,
           onSelect: copyEmail,
         },
-        { value: "LinkedIn", label: "LinkedIn", keywords: ["social", "profile", "connect"], icon: <Icon name="external" />, hint: "New tab", onSelect: openLinkedIn },
-        { value: "Download résumé", label: "Download résumé", keywords: ["resume", "cv", "pdf"], icon: <Icon name="download" />, hint: "PDF", onSelect: downloadResume },
+        {
+          value: "LinkedIn",
+          label: "LinkedIn",
+          keywords: ["social", "profile", "connect"],
+          icon: <Icon name="external" />,
+          hint: "New tab",
+          onSelect: () => openInNewTab(site.links.linkedin),
+        },
+        {
+          value: "GitHub",
+          label: "GitHub",
+          keywords: ["code", "repositories", "profile"],
+          icon: <Icon name="external" />,
+          hint: "New tab",
+          onSelect: () => openInNewTab(site.links.github),
+        },
+        {
+          value: "View résumé",
+          label: "View résumé",
+          keywords: ["resume", "cv", "pdf", "open", "read", "download"],
+          icon: <Icon name="external" />,
+          hint: "New tab",
+          onSelect: () => openInNewTab(site.links.resume),
+        },
       ],
     },
   ];

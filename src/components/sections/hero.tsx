@@ -244,7 +244,7 @@ export function Hero() {
       className="relative isolate flex min-h-svh flex-col overflow-x-clip"
     >
       <div className="container-page flex flex-1 flex-col justify-between gap-y-8 pt-[calc(var(--header-h)+2.5rem)] pb-[max(clamp(1.25rem,3vw,2.5rem),env(safe-area-inset-bottom))] max-md:pb-[max(1.5rem,env(safe-area-inset-bottom))] [@media(max-height:36rem)]:gap-y-6 [@media(max-height:36rem)]:pt-[calc(var(--header-h)+1rem)]">
-        {/* Label on the left, the two actions a visitor most wants on the right: talk, or take the résumé. */}
+        {/* Label on the left, the two actions a visitor most wants on the right: talk, or read the résumé. */}
         <div data-hero-top className="flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
           <p
             data-hero-fade
@@ -289,7 +289,8 @@ export function Hero() {
             </Magnetic>
             <a
               href={site.links.resume}
-              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="group relative isolate inline-flex h-10 items-center gap-2.5 px-4.5 text-[0.9375rem] whitespace-nowrap text-fg [--cut:0.5rem]"
             >
               <span
@@ -297,9 +298,12 @@ export function Hero() {
                 className="chamfer-ring absolute inset-0 -z-10 bg-line-strong transition-colors duration-300 group-hover:bg-fg"
               />
               <RollText>Résumé</RollText>
-              <span className="sr-only"> (PDF)</span>
-              <span aria-hidden className="transition-transform duration-500 ease-out group-hover:translate-y-0.5">
-                ↓
+              <span className="sr-only"> (PDF, opens in new tab)</span>
+              <span
+                aria-hidden
+                className="transition-transform duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              >
+                ↗
               </span>
             </a>
           </div>

@@ -1,11 +1,10 @@
 "use client";
 
 import { useRef } from "react";
-import boatRail from "@/assets/photos/boat-rail.jpg";
-import { ContactClocks } from "@/components/contact/contact-clocks";
+import { LivedInGlobe } from "@/components/places/lived-in-globe";
+import { ChannelMark } from "@/components/ui/channel-mark";
 import { CopyEmail } from "@/components/ui/copy-email";
 import { DecodeText } from "@/components/ui/decode-text";
-import { RevealImage } from "@/components/ui/reveal-image";
 import { RevealText } from "@/components/ui/reveal-text";
 import { site } from "@/content/site";
 import { DURATION, EASE, gsap, settlePendingTriggers, useGSAP } from "@/lib/gsap";
@@ -15,14 +14,27 @@ const MAILTO = `mailto:${site.email}`;
 const [EMAIL_USER, EMAIL_DOMAIN] = site.email.split("@");
 /** A line of the address, masked so it can drop in from under the line above it (room for descenders). */
 const MASK = "block overflow-hidden pb-[0.14em] -mb-[0.14em]";
+/**
+ * The other ways in, listed under the address with their marks, each in a new tab. The résumé opens in
+ * the browser's PDF viewer, which has its own download button, so nobody downloads it by accident.
+ */
+const LINKS = [
+  { label: "LinkedIn", href: site.links.linkedin, mark: "linkedin", note: "(opens in new tab)" },
+  { label: "GitHub", href: site.links.github, mark: "github", note: "(opens in new tab)" },
+  { label: "Résumé", href: site.links.resume, mark: "resume", note: "(PDF, opens in new tab)" },
+] as const;
+const MARK = "size-4 text-fg-muted transition-colors duration-500 group-hover:text-fg";
+/** The underline draws wherever the link is hovered or focused, its mark included. */
+const DRAW = "link-draw group-hover:bg-size-[100%_1px] group-focus-visible:bg-size-[100%_1px]";
+const ARROW = "text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:text-accent-ink";
 
 /**
  * (05) Contact — the finale. The address is the headline: it hangs from a line under "Let's talk.",
- * with a send button and Copy beside it, then LinkedIn and the résumé. The off-the-clock photo sits on
- * the left from tablets up (after the address in reading order, so phones and screen readers get the
- * heading first); under the actions, where Sabarish is based and the time there, with two clocks for a
- * visitor on another clock (contact/contact-clocks.tsx). Entrance: the line draws out, the address
- * drops in from under it, the rest rises in behind. Fits one screen from tablets up.
+ * and it opens the visitor's mail app, with Copy email under it, then LinkedIn, GitHub and the résumé,
+ * each with its mark, and where Sabarish is based. A live globe of the cities
+ * Sabarish has lived in (places/lived-in-globe.tsx) sits on the left from tablets up (after the address
+ * in reading order, so phones and screen readers get the heading first). Entrance: the line draws out,
+ * the address drops in from under it, the rest rises in behind. Fits one screen from tablets up.
  */
 export function Contact() {
   const root = useRef<HTMLElement>(null);
@@ -48,19 +60,20 @@ export function Contact() {
         mm.add("(prefers-reduced-motion: no-preference)", () => {
           if (!line || !address) return;
           settlePendingTriggers();
-          gsap
+          const entrance = gsap
             .timeline({ scrollTrigger: { trigger: line, start: "top 85%", once: true } })
             .fromTo(line, { scaleX: 0 }, { scaleX: 1, duration: DURATION.slow, ease: EASE.inOut }, 0)
             .fromTo(drops, { yPercent: -120 }, { yPercent: 0, duration: DURATION.base, ease: EASE.out, stagger: 0.09 }, 0.35)
-            .fromTo(
-              items,
-              { autoAlpha: 0, y: 12 },
-              { autoAlpha: 1, y: 0, duration: DURATION.base, ease: EASE.out, stagger: 0.08 },
-              0.6,
-            );
-          // The fromTos above have set their start states, so the line and the address can show without
-          // a flash of their finished look (a /#contact link lands here before the entrance starts).
+            // Opacity, not autoAlpha: the actions stay in the tab order before the entrance has played.
+            .fromTo(items, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: DURATION.base, ease: EASE.out, stagger: 0.08 }, 0.6);
+          // The fromTos above have set their start states, so everything can show without a flash of its
+          // finished look (a /#contact link lands here before the entrance starts).
           gsap.set([line, address], { autoAlpha: 1 });
+          gsap.set(items, { visibility: "visible" });
+          // Tabbing in before the section has scrolled into view finishes the entrance at once.
+          const finish = () => void entrance.progress(1);
+          section.addEventListener("focusin", finish);
+          return () => section.removeEventListener("focusin", finish);
         });
       });
       return () => mm?.revert();
@@ -96,19 +109,19 @@ export function Contact() {
             className="mt-[clamp(0.75rem,2svh,1.25rem)] block h-px origin-left bg-line-strong"
           />
 
-          {/* The address is the headline. Keyboard focus skips it: the send button right after it opens
-              the same email, so one tab stop does the job. */}
+          {/* The address is the headline and the way to write: it opens the visitor's mail app. */}
           <a
             data-contact-address
             data-reveal
             href={MAILTO}
-            tabIndex={-1}
+            // Named as one address: the two lines are blocks, which would read with a space between them.
+            aria-label={site.email}
             className="group mt-[clamp(0.5rem,1.4svh,1rem)] block w-fit font-serif text-[length:clamp(2.125rem,9.4vw,3.5rem)] leading-[0.95] tracking-[-0.025em] md:text-[length:min(5.2vw,9svh)]"
           >
             <span className={MASK}>
               <span
                 data-contact-drop
-                className="block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-[position:0_100%] bg-no-repeat transition-[background-size] duration-700 ease-out group-hover:bg-[length:100%_1px]"
+                className="block bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-[position:0_100%] bg-no-repeat transition-[background-size] duration-700 ease-out group-hover:bg-[length:100%_1px] group-focus-visible:bg-[length:100%_1px]"
               >
                 {EMAIL_USER}
               </span>
@@ -121,67 +134,42 @@ export function Contact() {
             </span>
           </a>
 
-          <div
+          <div data-contact-item data-reveal className="mt-[clamp(1rem,2.6svh,1.75rem)]">
+            <CopyEmail email={site.email} />
+          </div>
+
+          <ul
             data-contact-item
             data-reveal
-            className="mt-[clamp(1rem,2.6svh,1.75rem)] flex flex-wrap items-center gap-x-3 gap-y-4"
+            className="mt-[clamp(0.5rem,1.4svh,1rem)] flex flex-wrap items-center gap-x-6 gap-y-1 text-[0.9375rem]"
           >
-            <a
-              href={MAILTO}
-              className="group inline-flex h-12 chamfer-fill items-center gap-3 px-6 font-medium text-on-accent [--cut:0.625rem]"
-            >
-              Write an email
-              <span aria-hidden className="transition-transform duration-500 ease-out group-hover:translate-x-0.5">
-                →
-              </span>
-            </a>
-            <CopyEmail email={site.email} />
-            <span aria-hidden className="mx-2 hidden h-5 w-px bg-line-strong lg:block" />
-            <span className="flex basis-full items-center gap-x-6 lg:basis-auto lg:gap-x-5">
-              <a
-                href={site.links.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem]"
-              >
-                <span className="link-draw">LinkedIn</span>
-                <span
-                  aria-hidden
-                  className="text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-accent-ink"
-                >
-                  ↗
-                </span>
-                <span className="sr-only">(opens in new tab)</span>
-              </a>
-              <a href={site.links.resume} download className="group inline-flex min-h-11 items-center gap-1.5 text-[0.9375rem]">
-                <span className="link-draw">Résumé</span>
-                <span className="sr-only">(PDF)</span>
-                <span
-                  aria-hidden
-                  className="text-fg-muted transition-[translate,color] duration-500 ease-out group-hover:translate-y-0.5 group-hover:text-accent-ink"
-                >
-                  ↓
-                </span>
-              </a>
-            </span>
-          </div>
+            {LINKS.map(({ label, href, mark, note }) => (
+              <li key={label}>
+                <a href={href} target="_blank" rel="noopener noreferrer" className="group inline-flex min-h-11 items-center gap-2">
+                  <ChannelMark name={mark} className={MARK} />
+                  <span className={DRAW}>{label}</span>
+                  <span aria-hidden className={`${ARROW} group-hover:translate-x-0.5 group-hover:-translate-y-0.5`}>
+                    ↗
+                  </span>
+                  <span className="sr-only">{note}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {/* Its height follows the screen's (max-w in svh), so the section fits one screen from tablets up.
-            RevealImage draws the photo 1.16x the card's width (its drift overscan). */}
-        <RevealImage
-          src={boatRail}
-          alt={`${site.name} leaning on a boat's rail, looking out over the water`}
-          sizes="(min-width: 1600px) 640px, (min-width: 768px) 42vw, (min-width: 640px) 60vw, 98vw"
-          className="col-span-10 aspect-3/4 w-full [--cut:1rem] [--grain:0.12] sm:col-span-6 md:col-span-5 md:col-start-1 md:row-span-2 md:row-start-2 md:max-w-[50svh] lg:[--cut:1.5rem]"
-        />
+        {/* Its height follows the screen's (max-w in svh), so the section fits one screen from tablets up. */}
+        <LivedInGlobe className="col-span-10 sm:col-span-6 md:col-span-5 md:col-start-1 md:row-span-2 md:row-start-2 md:max-w-[50svh]" />
 
         <div
           data-contact-item
           data-reveal
           className="col-span-12 md:col-span-7 md:col-start-6 md:row-start-3 md:self-start"
         >
-          <ContactClocks />
+          <p className="eyebrow flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t border-line pt-[clamp(0.875rem,2.2svh,1.5rem)] text-fg-muted">
+            <span>{`Based in ${site.location.city}, ${site.location.region}, ${site.location.country}`}</span>
+            <span className="text-fg">{`Open to ${site.openTo.toLowerCase()}`}</span>
+          </p>
         </div>
       </div>
     </section>

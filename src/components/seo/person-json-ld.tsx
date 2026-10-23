@@ -32,7 +32,7 @@ export function PersonJsonLd() {
       addressCountry: "IN",
     },
     email: `mailto:${site.email}`,
-    sameAs: [site.links.linkedin],
+    sameAs: [site.links.linkedin, site.links.github],
     alumniOf: { "@type": "CollegeOrUniversity", name: education.school },
     knowsAbout: [
       ...TOP_SKILLS.filter((skill) => skills.has(skill)),

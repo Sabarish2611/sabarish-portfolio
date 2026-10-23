@@ -32,6 +32,8 @@ export const site = {
   links: {
     /** Confirmed by Sabarish, and the résumé links the same profile (the earlier /in/sabarishwaran-g was wrong). */
     linkedin: "https://www.linkedin.com/in/sabarish2611/",
+    /** Not on the résumé: given by Sabarish (October 2026). */
+    github: "https://github.com/Sabarish2611",
     resume: "/Sabarishwaran_G_Resume.pdf",
   },
 } as const;
@@ -175,6 +177,18 @@ export const experience: readonly Role[] = [
     projects: ["url-categorization"],
   },
 ];
+
+/**
+ * Every city Sabarish has lived in, for the globe in Contact. Not on the résumé: confirmed by Sabarish
+ * (October 2026), in the order he gave them; it is not a timeline.
+ */
+export const livedIn: readonly string[] = ["Trichy", "Bangalore", "Coimbatore", "Chennai"];
+
+/**
+ * Where the globe's world flights go, out of and back into Trichy. Chosen by Sabarish (October 2026)
+ * for the illustration; not a claim about trips taken or routes flown.
+ */
+export const flightDestinations: readonly string[] = ["Singapore", "Auckland", "Stockholm", "Brisbane", "Dubai"];
 
 export const education = {
   degree: "B.Tech in Computer Science Engineering (Artificial Intelligence)",

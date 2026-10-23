@@ -33,7 +33,8 @@ All facts live in two files. Components never hard-code them:
 - `src/content/site.ts`: name, role, email, links, location, skills, experience and education
 - `src/content/projects.ts`: the four case studies (copy, metrics, stack, visual)
 
-The résumé served by the download links is `public/Sabarishwaran_G_Resume.pdf`.
+The résumé is `public/Sabarishwaran_G_Resume.pdf`. Every Résumé link opens it in a new tab, where the browser's
+viewer has its own download button; none downloads it directly.
 
 ## Theme and accent
 
