@@ -110,8 +110,8 @@ export default function Image() {
             </div>
             <div style={{ marginTop: 24, height: 1, display: "flex", backgroundColor: OG.line }} />
             {/* The hero's label; it fills the row, so the location sits up top with the company. */}
-            <div style={{ marginTop: 20, display: "flex", color: OG.muted, ...eyebrowStyle, fontSize: 17, letterSpacing: 1.8 }}>
-              Data Scientist · AI Engineer · Forward Deployed Engineer
+            <div style={{ marginTop: 20, display: "flex", color: OG.muted, ...eyebrowStyle, fontSize: 15, letterSpacing: 1.3, whiteSpace: "nowrap" }}>
+              Data Scientist · AI Engineer · Aspiring Forward Deployed Engineer
             </div>
           </div>
         </div>

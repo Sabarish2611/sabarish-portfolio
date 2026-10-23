@@ -1,14 +1,19 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { TOOL_ICONS } from "@/content/tool-icons";
 import { cn } from "@/lib/cn";
 import { EASE, gsap, ScrollTrigger, settlePendingTriggers, useGSAP } from "@/lib/gsap";
 import type { ToolkitElement } from "./toolkit-data";
 
-/** Each group's tile tint: the foreground mixed in at rising strengths, like a printed table's greys. */
-const TINTS = [4, 10, 17, 25, 34];
-const tint = (group: number) => `color-mix(in oklab, var(--fg) ${TINTS[group % TINTS.length]}%, transparent)`;
+/** Each group's tile tint: the foreground mixed in at rising strengths, like a printed table's greys.
+ *  The top step stays low enough for text-fg to keep 4.5:1 on it in the dark theme. */
+const TINTS = [4, 11, 19, 28, 38];
+const strength = (group: number) => TINTS[group % TINTS.length];
+const tint = (group: number) => `color-mix(in oklab, var(--fg) ${strength(group)}%, transparent)`;
+/** Muted text nears or falls under 4.5:1 from the 11% tint up (4.5:1 there in the light theme, 2.6:1 at
+ *  the top step): there a tile's small text uses the full foreground. */
+const smallText = (group: number) => (strength(group) >= 10 ? "text-fg" : "text-fg-muted");
 
 const ARROWS: Record<string, [number, number]> = {
   ArrowLeft: [0, -1],
@@ -21,14 +26,18 @@ const ARROWS: Record<string, [number, number]> = {
  * The Toolkit as a periodic table: each skill an element, numbered in résumé order and set where
  * that element sits in the real table, tinted by its résumé group. The notch above the middle block
  * holds the enlarged element and the key, as in interactive tables: pointing at, tapping or arrowing
- * to an element shows its full name, group and the case studies whose stack used it; pointing at a
- * group in the key lights its elements. Below lg the elements wrap in a plain grid under the key.
+ * to an element shows its full name, group and the case studies whose stack used it. The key's groups
+ * are toggle buttons: pointing at one previews its elements, a click, tap, Enter or Space pins the
+ * highlight, Escape clears it. Below lg the elements wrap in a plain grid under the key.
  * Entrance: the elements fill in by number. Reduced motion: the finished table.
  */
 export function PeriodicTable({ elements, groups }: { elements: readonly ToolkitElement[]; groups: readonly string[] }) {
   const root = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const [lit, setLit] = useState<number | null>(null);
+  // The key's highlight: a mouse hover previews a group, a pinned group stays lit until toggled off.
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [pinned, setPinned] = useState<number | null>(null);
+  const lit = hovered ?? pinned;
   const shown = elements[active];
   const counts = groups.map((_, g) => elements.filter((e) => e.group === g).length);
 
@@ -42,12 +51,17 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
         const tiles = gsap.utils.toArray<HTMLElement>("[data-tile]", el);
         const key = gsap.utils.toArray<HTMLElement>("[data-key]", el);
         gsap.set(el, { autoAlpha: 1 });
+        // Opacity, not autoAlpha: the tiles stay in the tab order before the entrance has played.
         const intro = gsap
           .timeline({ paused: true, defaults: { ease: EASE.out } })
-          .fromTo(tiles, { autoAlpha: 0, y: 10, scale: 0.92 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.018 }, 0)
-          .fromTo(key, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.1 }, 0.35);
+          .fromTo(tiles, { opacity: 0, y: 10, scale: 0.92 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.018 }, 0)
+          .fromTo(key, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.1 }, 0.35);
         settlePendingTriggers();
         ScrollTrigger.create({ trigger: el, start: "top 80%", once: true, onEnter: () => void intro.play() });
+        // Tabbing in before the table has scrolled into view finishes the entrance at once.
+        const finish = () => void intro.progress(1);
+        el.addEventListener("focusin", finish);
+        return () => el.removeEventListener("focusin", finish);
       });
       return () => mm.revert();
     },
@@ -76,13 +90,25 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
     root.current?.querySelector<HTMLElement>(`[data-tile="${best}"]`)?.focus();
   };
 
+  // Escape anywhere in the table clears the key's highlight.
+  const onRootKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Escape" || lit === null) return;
+    setPinned(null);
+    setHovered(null);
+  };
+  // Hover previews are for mice only: a tap fires pointerenter too, and its click is what pins.
+  const hoverGroup = (g: number | null) => (event: PointerEvent) => {
+    if (event.pointerType === "mouse") setHovered(g);
+  };
+
   const icon = shown.icon ? TOOL_ICONS[shown.icon] : null;
 
   return (
     <div
       ref={root}
       data-reveal
-      className="mx-auto grid max-w-[88rem] grid-cols-6 gap-1 sm:grid-cols-9 lg:grid-cols-18 lg:gap-[clamp(3px,0.3vw,5px)]"
+      onKeyDown={onRootKeyDown}
+      className="mx-auto grid max-w-[88rem] grid-cols-6 gap-1 sm:grid-cols-9 md:grid-cols-10 lg:grid-cols-18 lg:gap-[clamp(3px,0.3vw,5px)]"
     >
       {/* The notch: the enlarged element and the key. */}
       <div className="col-span-full mb-4 grid grid-cols-[auto_1fr] gap-x-[clamp(1rem,2vw,2rem)] gap-y-4 lg:col-[3/13] lg:row-[1/4] lg:mb-0 lg:px-[clamp(0.5rem,1vw,1rem)]">
@@ -92,7 +118,7 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
           className="chamfer relative flex aspect-square w-[clamp(7rem,13svh,9.5rem)] flex-col justify-between p-3 [--cut:0.75rem]"
           style={{ background: tint(shown.group) }}
         >
-          <span className="flex items-start justify-between font-mono text-xs text-fg-muted tabular-nums">
+          <span className={cn("flex items-start justify-between font-mono text-xs tabular-nums", smallText(shown.group))}>
             {shown.number}
             {icon ? (
               <svg aria-hidden viewBox="0 0 24 24" className="size-4 fill-current">
@@ -120,20 +146,33 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
               {shown.usedIn.length ? `Used in ${shown.usedIn.join(" · ")}` : shown.method ? "A method" : "A tool"}
             </dd>
           </dl>
-          <ul aria-label="Groups" className="grid w-fit gap-x-6 gap-y-1 sm:grid-cols-2 xl:gap-x-8">
+          <ul aria-label="Groups" className="grid w-fit gap-x-6 sm:grid-cols-2 xl:gap-x-8">
             {groups.map((label, g) => (
-              <li
-                key={label}
-                onPointerEnter={() => setLit(g)}
-                onPointerLeave={() => setLit(null)}
-                className={cn(
-                  "flex items-center gap-2 text-xs whitespace-nowrap transition-colors duration-300",
-                  lit === g ? "text-fg" : "text-fg-muted",
-                )}
-              >
-                <span aria-hidden className="size-3 shrink-0 ring-1 ring-line-strong" style={{ background: tint(g) }} />
-                {label}
-                <span className="font-mono tabular-nums opacity-60">{counts[g]}</span>
+              <li key={label}>
+                <button
+                  type="button"
+                  aria-pressed={pinned === g}
+                  onClick={() => setPinned((p) => (p === g ? null : g))}
+                  onPointerEnter={hoverGroup(g)}
+                  onPointerLeave={hoverGroup(null)}
+                  className={cn(
+                    "flex min-h-11 cursor-pointer items-center gap-2 text-left text-xs whitespace-nowrap transition-colors duration-300 hover:text-fg md:min-h-6",
+                    lit === g ? "text-fg" : "text-fg-muted",
+                  )}
+                >
+                  {/* A mini tile: the group's tint inside a hairline, cut like the elements. The pinned
+                      group's outline turns accent, like the selected element's. */}
+                  <span aria-hidden className="chamfer relative size-4 shrink-0 [--cut:4px]" style={{ background: tint(g) }}>
+                    <span
+                      className={cn(
+                        "chamfer-ring absolute inset-0 [--cut:4px]",
+                        pinned === g ? "bg-accent-ink [--ring:1.5px]" : "bg-line-strong",
+                      )}
+                    />
+                  </span>
+                  <span>{label}</span>
+                  <span className="font-mono tabular-nums">{counts[g]}</span>
+                </button>
               </li>
             ))}
           </ul>
@@ -152,7 +191,7 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
               onPointerEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
               onClick={() => setActive(i)}
-              className="relative aspect-square min-w-0 cursor-default outline-none lg:[grid-column:var(--c)] lg:[grid-row:var(--r)]"
+              className="group/tile relative aspect-square min-w-0 cursor-default outline-none lg:[grid-column:var(--c)] lg:[grid-row:var(--r)]"
               style={{ ["--r" as string]: e.row, ["--c" as string]: e.col }}
             >
               {/* The entrance animates the item; the group dimming fades this face, so the two never
@@ -167,7 +206,7 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
               >
                 {/* The selected element's outline; also the focus indicator, which the clip would cut off. */}
                 {on ? <span className="chamfer-ring absolute inset-0 bg-accent-ink [--cut:0.4rem] [--ring:1.5px]" /> : null}
-                <span className="font-mono text-[0.5625rem] leading-none text-fg-muted tabular-nums">{e.number}</span>
+                <span className={cn("font-mono text-[0.625rem] leading-none tabular-nums", smallText(e.group))}>{e.number}</span>
                 <span
                   className={cn(
                     "text-center text-[clamp(1rem,1.6vw,1.6rem)] leading-none text-fg",
@@ -176,10 +215,21 @@ export function PeriodicTable({ elements, groups }: { elements: readonly Toolkit
                 >
                   {e.symbol}
                 </span>
-                <span className="truncate text-center text-[0.5625rem] leading-none text-fg-muted lg:max-xl:hidden">
+                <span
+                  className={cn(
+                    "truncate text-center text-[0.5625rem] leading-none sm:text-[0.625rem] lg:max-xl:hidden",
+                    smallText(e.group),
+                  )}
+                >
                   {e.label}
                 </span>
               </span>
+              {/* Keyboard focus gets its own cue: the selected outline alone looks the same before and after
+                  Tab arrives on the selected tile. Outside the face, which the clip would cut. */}
+              <span
+                aria-hidden
+                className="detect-brackets pointer-events-none absolute -inset-1 hidden text-accent-ink [--arm:0.5rem] group-focus-visible/tile:block"
+              />
               <span className="sr-only">{`${e.name}, ${groups[e.group]}${e.usedIn.length ? `, used in ${e.usedIn.join(" and ")}` : ""}`}</span>
             </li>
           );

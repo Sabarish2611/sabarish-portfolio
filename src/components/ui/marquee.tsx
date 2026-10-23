@@ -72,12 +72,13 @@ export function MarqueeGroup({
         <span aria-hidden className="h-px flex-1 bg-line" />
         <button
           type="button"
-          // An explicit choice overrides the focus hold, so "Play" plays even while focused.
+          // An explicit choice overrides the focus hold, so "Play" plays even while focused. Below md an
+          // invisible ::after (::before draws the outline) stretches the 40px button to a 44px tap target.
           onClick={() => {
             setHeld(false);
             writePaused(!paused);
           }}
-          className="eyebrow inline-flex h-10 chamfer-outline items-center gap-2.5 px-4 text-fg-muted transition-colors duration-300 hover:text-fg hover:[--outline:var(--fg)] motion-reduce:hidden md:h-8 md:px-3.5"
+          className="eyebrow inline-flex h-10 chamfer-outline items-center gap-2.5 px-4 text-fg-muted transition-colors duration-300 after:absolute after:inset-x-0 after:-inset-y-0.5 hover:text-fg hover:[--outline:var(--fg)] motion-reduce:hidden md:h-8 md:px-3.5 md:after:hidden"
         >
           <PlaybackIcon paused={paused} />
           {paused ? "Play" : "Pause"}

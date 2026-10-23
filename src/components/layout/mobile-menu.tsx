@@ -26,9 +26,12 @@ import { ThemeToggle } from "./theme-toggle";
 
 export const MOBILE_MENU_ID = "mobile-menu";
 
-/** Shared by the header's Menu button and the overlay's Close button, which sits exactly on top of it. */
+/**
+ * Shared by the header's Menu button and the overlay's Close button, which sits exactly on top of it.
+ * The ::after is an invisible 44px hit area around the 40px button (::before paints the outline).
+ */
 export const MENU_BUTTON_CLASS =
-  "eyebrow flex h-10 min-w-[5.25rem] shrink-0 chamfer-outline items-center justify-center px-3 [--outline:var(--line)]";
+  "eyebrow flex h-10 min-w-[5.25rem] shrink-0 chamfer-outline items-center justify-center px-3 [--outline:var(--line)] after:absolute after:-inset-0.5";
 
 /** Raw swatch colours: `--accent` only ever holds the active one. */
 export const ACCENT_SWATCHES: Record<Accent, { label: string; hex: string }> = {
@@ -308,8 +311,12 @@ function MenuFooter() {
     <div className="container-page mt-auto pt-10 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
       <div data-menu-fade>
         <p className="eyebrow text-fg-muted">Get in touch</p>
-        {/* Padded to a 40px+ tap target without moving anything; the underline stays at the text. */}
-        <a href={`mailto:${site.email}`} className="link-draw -mb-2 inline-block bg-origin-content py-2 text-lead">
+        {/* Padded to a tap target without moving anything (the underline stays at the text); the
+            ::after stretches the hit area to 44px. */}
+        <a
+          href={`mailto:${site.email}`}
+          className="link-draw relative -mb-2 inline-block bg-origin-content py-2 text-lead after:absolute after:inset-x-0 after:top-1/2 after:h-11 after:-translate-y-1/2"
+        >
           {site.email}
         </a>
       </div>
@@ -345,7 +352,7 @@ function MenuFooter() {
 
 function ExternalLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="group inline-flex h-10 items-center gap-2">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="group relative inline-flex h-10 items-center gap-2 after:absolute after:-inset-y-0.5 after:inset-x-0">
       <span className="link-draw">{children}</span>
       <span
         aria-hidden
@@ -372,7 +379,7 @@ function Swatch({ accent, active }: { accent: Accent; active: boolean }) {
       onClick={select}
       aria-pressed={active}
       aria-label={`${label} accent`}
-      className="grid size-10 chamfer-outline place-items-center [--cut:0.4rem] [--outline:var(--line)] hover:[--outline:var(--line-strong)] aria-pressed:[--outline:var(--fg)]"
+      className="grid size-10 chamfer-outline place-items-center [--cut:0.4rem] after:absolute after:-inset-0.5 [--outline:var(--line)] hover:[--outline:var(--line-strong)] aria-pressed:[--outline:var(--fg)]"
     >
       <span className="size-4 rounded-full ring-1 ring-black/15 ring-inset" style={{ backgroundColor: hex }} />
     </button>

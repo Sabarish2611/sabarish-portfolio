@@ -6,7 +6,7 @@ import { RevealText } from "@/components/ui/reveal-text";
 import { methodSkills, site, skillGroups } from "@/content/site";
 import { SKILL_ICONS, TOOL_ICONS, type ToolIconSlug } from "@/content/tool-icons";
 
-// One role per line, as in the hero's label: data scientist, AI engineer, forward-deployed engineer.
+// One role per line, as in the hero's label: data scientist, AI engineer, (aspiring) forward-deployed engineer.
 // The spaces before each <br> keep the phrases apart in the heading's accessible name.
 const HEADING = (
   <>
@@ -107,7 +107,7 @@ export function About() {
           <RevealText
             as="h2"
             id="about-title"
-            className="mt-[clamp(1rem,2.6svh,2rem)] font-serif text-[length:clamp(2.75rem,min(6vw,8svh),6.5rem)] leading-[0.92] tracking-[-0.03em]"
+            className="mt-[clamp(1rem,2.6svh,2rem)] font-serif text-[length:clamp(2.75rem,min(7.4vw,11svh),8.5rem)] leading-[0.92] tracking-[-0.03em]"
           >
             {HEADING}
           </RevealText>
@@ -124,7 +124,7 @@ export function About() {
           className="col-span-9 aspect-4/5 [--cut:0.875rem] [--grain:0.12] sm:col-span-6 md:col-span-4 md:col-start-9 md:row-span-2 md:row-start-1 md:w-full md:max-w-[40svh] md:self-start md:justify-self-end xl:[--cut:1.125rem]"
         />
 
-        <RevealText className="col-span-12 max-w-[54ch] font-serif text-[length:clamp(1.125rem,min(1.75vw,2.7svh),1.625rem)] leading-[1.4] text-fg md:col-span-8 md:row-start-2">
+        <RevealText className="col-span-12 max-w-[54ch] font-serif text-[length:clamp(1.125rem,min(1.85vw,2.9svh),1.875rem)] leading-[1.4] text-pretty text-fg md:col-span-8 md:row-start-2 md:max-w-none lg:col-span-7">
           {STATEMENT}
         </RevealText>
       </div>
@@ -134,13 +134,13 @@ export function About() {
           (reduced motion) take smaller type, so the section still fits one screen. */}
       <MarqueeGroup
         label="scrolling skills"
-        className="mt-[clamp(2.5rem,5svh,3.5rem)] flex flex-col gap-[clamp(0.75rem,1.8svh,1.25rem)] md:mt-[clamp(1.75rem,6svh,4.5rem)]"
+        className="mt-[clamp(2.5rem,5svh,3.5rem)] flex flex-col gap-[clamp(0.75rem,1.8svh,1.25rem)] md:mt-[clamp(1.5rem,4.5svh,3.5rem)]"
       >
         <Marquee
           items={METHODS}
           ariaLabel="Methods"
           speed={50}
-          className="font-serif text-[length:clamp(2rem,min(3.6vw,4.6svh),3.5rem)] leading-[1.1] motion-reduce:text-[length:clamp(1.25rem,min(2vw,3svh),1.75rem)]"
+          className="font-serif text-[length:clamp(2rem,min(3.6vw,4.6svh),3.5rem)] leading-[1.1] motion-reduce:text-[length:clamp(1.25rem,min(1.8vw,2.6svh),1.625rem)]"
         />
         <Marquee
           items={TOOL_LOGOS}

@@ -267,7 +267,7 @@ function SectionCounter() {
       aria-hidden
       className={cn(
         // Steps aside on the narrowest phones (under 23rem), where it would crowd the logo.
-        "eyebrow whitespace-nowrap text-fg-subtle transition-opacity duration-300 max-[23rem]:hidden md:hidden",
+        "eyebrow whitespace-nowrap text-fg-muted transition-opacity duration-300 max-[23rem]:hidden md:hidden",
         section ? "opacity-100" : "opacity-0",
       )}
     >
@@ -294,6 +294,8 @@ function CommandButton() {
       className={cn(
         "eyebrow hidden h-10 items-center justify-center gap-1.5 chamfer-outline px-4 text-fg-muted transition-colors duration-300 [--outline:var(--line)] hover:text-fg hover:[--outline:var(--line-strong)] sm:flex md:hidden lg:flex",
         "pointer-coarse:w-10 pointer-coarse:px-0 pointer-coarse:text-fg md:pointer-coarse:flex",
+        // Phones: a 44px hit area around the 40px button (::before paints the outline).
+        "max-md:after:absolute max-md:after:-inset-0.5",
       )}
     >
       <kbd className="font-mono pointer-coarse:hidden">{key}</kbd>

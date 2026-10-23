@@ -20,7 +20,8 @@ if (!/^\S+ \S$/u.test(site.name) || !site.name.startsWith(site.shortName)) {
 /**
  * The wordmark link home, shared by the header and the mobile menu's bar (which must line up with
  * it exactly). "Sabarish G." on screen, "Sabarish G — home" for assistive tech: the visible words
- * lead the accessible name, so speech input can target them. 40px tall for touch. Tracked like the
+ * lead the accessible name, so speech input can target them. 40px tall, with a 44px hit area on phones
+ * (an invisible ::after, so the box the dock measures doesn't change). Tracked like the
  * hero name (-0.035em), so the name's flying copy (sections/hero.tsx) lands on it exactly.
  */
 export function LogoLink({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> }) {
@@ -28,7 +29,7 @@ export function LogoLink({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorEl
     <Link
       href="/"
       onClick={onClick}
-      className="inline-flex h-10 items-center font-serif text-[1.7rem] leading-none tracking-[-0.035em] whitespace-nowrap"
+      className="relative inline-flex h-10 items-center font-serif text-[1.7rem] leading-none tracking-[-0.035em] whitespace-nowrap after:absolute after:inset-x-0 after:-inset-y-0.5 md:after:hidden"
     >
       {WORDMARK}
       <span aria-hidden className="text-accent-ink">

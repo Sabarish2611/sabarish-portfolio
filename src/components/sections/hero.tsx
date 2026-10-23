@@ -259,7 +259,7 @@ export function Hero() {
               {" ·\u00A0"}
               <span className="whitespace-nowrap">AI Engineer</span>
               <span className="max-lg:hidden">{" ·\u00A0"}</span>
-              <span className="max-lg:block lg:whitespace-nowrap">Forward Deployed Engineer</span>
+              <span className="max-lg:block lg:whitespace-nowrap">Aspiring Forward Deployed Engineer</span>
             </span>
           </p>
 

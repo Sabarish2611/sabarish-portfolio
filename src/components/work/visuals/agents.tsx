@@ -95,49 +95,25 @@ function agentsTimeline(el: HTMLElement, layout: AgentsLayout): Playback {
   const structuralAt = share("structural", "structural");
   const semanticAt = share("semantic", "semantic");
 
-  // Hide the settled frame; the intro draws the empty diagram and each run lights it again.
+  // Hide the settled run; the intro draws the wiring and each run lights the diagram again.
   gsap.set([...lits, ...trails, ...zoneLits, wait, pulse], { opacity: 0 });
 
-  /* ---------- Intro: zones fade in, then the wiring draws along the flow, nodes popping as it arrives. ---------- */
+  /* ---------- Intro: zones, nodes and labels sit at rest from the first frame; the wiring draws
+     on along the flow. ---------- */
   const tl = gsap.timeline({ defaults: { ease: EASE.out } });
   const wires = (ids: string[]) => ids.map((id) => q(`[data-wire='${id}']`)[0]);
-  const bases = (ids: string[]) => ids.map((id) => part(id, "base"));
-  const labels = (ids: string[]) => ids.flatMap((id) => q(`[data-label='${id}']`));
-  // Labels, captions and headings drop out on smaller frames: skip their tweens rather than hand
-  // GSAP an empty target list (it warns).
-  const from = (targets: Element[], vars: gsap.TweenVars, t: number) => void (targets.length && tl.from(targets, vars, t));
-  const pop = (ids: string[], t: number, stagger = 0) => {
-    from(bases(ids), { scale: 0, transformOrigin: "50% 50%", duration: 0.5, stagger }, t);
-    from(labels(ids), { opacity: 0, y: 4, duration: 0.6, stagger }, t + 0.05);
-  };
   const draw = (ids: string[], t: number, duration: number) =>
     tl.fromTo(wires(ids), { drawSVG: "0%" }, { drawSVG: "100%", duration, ease: "none" }, t);
   const rows = [0, 1, 2, 3, 4];
   const each = (prefix: string) => rows.map((k) => `${prefix}-${k}`);
 
-  from(q("[data-lattice]"), { opacity: 0, duration: 1.4, ease: "none" }, 0);
-  from(q("[data-zone]"), { opacity: 0, duration: 0.9, ease: "none", stagger: 0.08 }, 0.1);
-  from(q("[data-caption]"), { opacity: 0, y: 4, duration: 0.7, stagger: 0.08 }, 0.25);
   draw(["ingest"], 0.3, 1);
-  pop(["ticket"], 0.3);
-  ingestStops.forEach(([id, f]) => pop([id], 0.3 + f));
   draw(["structural", "semantic"], 1.3, 0.8);
-  pop(["structural", "semantic"], 1.3 + 0.8 * Math.min(structuralAt, semanticAt));
-  pop(["dedup"], 2.05);
   draw(["hub"], 2.1, 0.45);
-  from(wires(["lookup"]), { opacity: 0, duration: 0.5, ease: "none" }, 2.15);
-  pop(["store-0", "store-1", "store-2", "store-3"], 2.3, 0.05);
-  pop(["hub"], 2.5);
+  tl.from(wires(["lookup"]), { opacity: 0, duration: 0.5, ease: "none" }, 2.15);
   draw([...each("agent"), "human"], 2.55, 0.6);
-  pop(each("agent"), 3.05, 0.04);
-  pop(["human"], 3.1);
   draw(each("flow"), 3.15, 0.3);
-  pop(each("flow"), 3.35, 0.04);
   draw([...each("mcp"), "outcome-0", "outcome-1"], 3.4, 0.5);
-  pop(["port"], 3.85);
-  pop([...each("tool"), ...each("intel")], 3.6, 0.025);
-  from(q("[data-pill]"), { opacity: 0, duration: 0.6, stagger: 0.1 }, 3.85);
-  from(q("[data-header]"), { opacity: 0, duration: 0.6, stagger: 0.05 }, 3.6);
   const introEnd = 4.5;
 
   /* ---------- Loop: one escalation per run, from the ticket to the human's call. ---------- */

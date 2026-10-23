@@ -1,4 +1,8 @@
+import { getProject } from "@/content/projects";
 import { education, experience } from "@/content/site";
+
+/** A case study linked under its role: /work/<slug>, labelled with the project's short title. */
+export type TimelineLink = { slug: string; label: string };
 
 /** One stop on the Experience timeline — roles and education share a shape (facts from content/site). */
 export type TimelineItem = {
@@ -12,7 +16,18 @@ export type TimelineItem = {
   startISO: string;
   endISO?: string;
   cgpa?: string;
+  /** The role's case studies, in content order (none for education). */
+  projects: readonly TimelineLink[];
 };
+
+/** A role's project slugs as links; an unknown slug fails the build rather than linking to a 404. */
+function caseStudies(title: string, slugs: readonly string[]): TimelineLink[] {
+  return slugs.map((slug) => {
+    const project = getProject(slug);
+    if (!project) throw new Error(`Experience: "${title}" lists the project "${slug}", which projects.ts doesn't have.`);
+    return { slug, label: project.shortTitle };
+  });
+}
 
 /** Oldest first: the path reads left to right (top to bottom on phones) and ends at the present. */
 export const timelineItems: readonly TimelineItem[] = [
@@ -26,6 +41,7 @@ export const timelineItems: readonly TimelineItem[] = [
     startISO: role.startISO,
     endISO: role.endISO,
     place: role.place,
+    projects: caseStudies(role.title, role.projects),
   })),
   {
     id: "education",
@@ -38,6 +54,7 @@ export const timelineItems: readonly TimelineItem[] = [
     startISO: education.startISO,
     endISO: education.endISO,
     cgpa: education.cgpa,
+    projects: [],
   },
 ].sort((a, b) => a.startISO.localeCompare(b.startISO));
 

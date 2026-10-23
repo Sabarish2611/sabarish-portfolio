@@ -20,7 +20,7 @@ import {
 
 /**
  * MLOps pipeline: seven real stages connected in order. The hero adds the six label sources
- * converging into labeling and the daily-retrain loop. The pipeline draws itself on, then runs:
+ * converging into labeling and the daily-retrain loop. Its wiring draws itself on, then it runs:
  * progress fills stage by stage and resets (card) or returns along the retrain loop (hero).
  */
 export function PipelineVisual({ variant, className }: { variant: Variant; className?: string }) {
@@ -63,7 +63,6 @@ function pipelineTimeline(el: HTMLElement, layout: PipelineLayout): Playback {
   // The settled run stays lit between runs (the next run draws over it); only the rest fades.
   const fading = lits.slice(STILL_STAGE + 1);
   const pings = stages.map((s) => s.querySelector("[data-ping]"));
-  const nodes = stages.map((s) => s.querySelector("[data-node]"));
 
   // All geometry in one read pass, before anything is written: the run, loop and feeds become
   // lookup tables, so the pulse and particles move with writes only (no layout flush per frame).
@@ -78,31 +77,18 @@ function pipelineTimeline(el: HTMLElement, layout: PipelineLayout): Playback {
 
   gsap.set([...lits, pulse, still], { opacity: 0 });
 
-  /* ---------- Intro: feeds converge, then one continuous stroke draws the stages in order. ---------- */
+  /* ---------- Intro: the stages, labels and sources sit at rest from the first frame; only the
+     wiring draws on — the feeds converge, then one continuous stroke runs the stages in order. ---------- */
   const tl = gsap.timeline({ defaults: { ease: EASE.out } });
-  tl.from("[data-lattice]", { opacity: 0, duration: 1.4, ease: "none" }, 0);
   let at = 0;
   if (feeds.length) {
-    tl.from(q("[data-feed-label], [data-feed-dot]"), { opacity: 0, duration: 0.6, stagger: 0.06 }, 0).fromTo(
-      feeds,
-      { drawSVG: "0%" },
-      { drawSVG: "100%", duration: 1.1, ease: EASE.inOut, stagger: 0.07 },
-      0.25,
-    );
+    tl.fromTo(feeds, { drawSVG: "0%" }, { drawSVG: "100%", duration: 1.1, ease: EASE.inOut, stagger: 0.07 }, 0.25);
     at = 0.7;
   }
   const build = 2.2 / L; // seconds per px: the whole run draws in 2.2s at any size
-  stages.forEach((_, i) => {
-    const t = at + stops[i] * build;
-    tl.from(nodes[i], { scale: 0, transformOrigin: "50% 50%", duration: 0.6 }, t).from(
-      q(`[data-label='${i}']`),
-      { opacity: 0, y: 4, duration: 0.7, stagger: 0.05 },
-      t + 0.05,
-    );
-    if (links[i]) {
-      const span = (stops[i + 1] - stops[i]) * build;
-      tl.fromTo(links[i], { drawSVG: "0%" }, { drawSVG: "100%", duration: span, ease: "none" }, t);
-    }
+  links.forEach((link, i) => {
+    const span = (stops[i + 1] - stops[i]) * build;
+    tl.fromTo(link, { drawSVG: "0%" }, { drawSVG: "100%", duration: span, ease: "none" }, at + stops[i] * build);
   });
   let introEnd = at + 2.2 + 0.5;
   if (loop) {
@@ -114,8 +100,7 @@ function pipelineTimeline(el: HTMLElement, layout: PipelineLayout): Playback {
       { strokeDashoffset: 0, duration: 1.2, ease: EASE.inOut },
       t,
     )
-      .from("[data-arrow]", { opacity: 0, duration: 0.3, ease: "none" }, t + 1.1)
-      .from("[data-label='loop']", { opacity: 0, duration: 0.7 }, t + 0.6);
+      .from("[data-arrow]", { opacity: 0, duration: 0.3, ease: "none" }, t + 1.1);
     introEnd = t + 1.4;
   }
 

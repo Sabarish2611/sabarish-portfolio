@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import type { TimelineItem } from "./timeline-items";
@@ -92,6 +93,28 @@ export function TimelineEntry({ item, side, x, room }: { item: TimelineItem; sid
           {item.org}
           {item.place ? <span className="text-fg-muted">{`, ${item.place}`}</span> : null}
         </p>
+
+        {item.projects.length ? (
+          // The role's case studies, as cut-corner buttons like the site's others (smaller type from
+          // tablets up, so two fit a row). Each enters with its stop (data-tl-item), by opacity alone, so
+          // they're in the tab order before the timeline has played.
+          <ul
+            aria-label={`Case studies from ${item.title}`}
+            className="mt-3 flex flex-wrap gap-2 md:mt-[clamp(0.5rem,1.4svh,0.875rem)]"
+          >
+            {item.projects.map((project) => (
+              <li key={project.slug} data-tl-item data-reveal>
+                <Link
+                  href={`/work/${project.slug}`}
+                  transitionTypes={["nav-forward"]}
+                  className="eyebrow inline-flex h-11 chamfer-outline items-center px-4 text-fg [--cut:0.5rem] hover:[--outline:var(--fg)] md:h-8 md:px-3.5 md:text-[0.6875rem] md:tracking-[0.04em]"
+                >
+                  {project.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
 
         {item.cgpa ? (
           <dl data-tl-item data-reveal className="eyebrow mt-3 flex gap-2 md:mt-[clamp(0.5rem,1.4svh,0.875rem)]">

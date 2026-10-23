@@ -28,10 +28,12 @@ export function Footer() {
       <div className="container-page grid grid-cols-12 gap-x-3 gap-y-12 pt-16 pb-16 sm:gap-x-6 md:pt-24 md:pb-24">
         <nav aria-labelledby="footer-navigate" className="col-span-6 md:col-span-4 lg:col-span-3">
           <ColumnTitle id="footer-navigate">Navigate</ColumnTitle>
-          <ul className="mt-4">
+          {/* Phones: each link gets an invisible 44px hit area (::after), and the rows a gap so the
+              hit areas don't touch. */}
+          <ul className="mt-4 max-md:flex max-md:flex-col max-md:items-start max-md:gap-2">
             {SECTIONS.map((section, i) => (
               <li key={section.id}>
-                <ScrollLink to={section.id} className="group inline-flex h-10 items-center gap-3">
+                <ScrollLink to={section.id} className="group relative inline-flex h-10 items-center gap-3 max-md:after:absolute max-md:after:-inset-y-0.5 max-md:after:inset-x-0">
                   <span className="eyebrow text-fg-muted transition-colors duration-300 group-hover:text-accent-ink">
                     0{i + 1}
                   </span>

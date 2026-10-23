@@ -27,6 +27,8 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-pressed={theme === "light"}
       className={cn(
         "grid size-10 chamfer-outline place-items-center text-fg transition-colors duration-300 [--cut:0.4rem] [--outline:var(--line)] hover:[--outline:var(--line-strong)]",
+        // Phones: a 44px hit area around the 40px button, on ::after (::before paints the outline).
+        "max-md:after:absolute max-md:after:-inset-0.5",
         className,
       )}
     >

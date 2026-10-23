@@ -72,13 +72,11 @@ function categoriesTimeline(el: HTMLElement, layout: CategoriesLayout): Playback
     }
   };
 
-  /* ---------- Intro: lanes draw in, the grid assembles, the stream fades up already moving. ---------- */
-  const tl = gsap.timeline({ defaults: { ease: EASE.out } });
+  /* ---------- Intro: the grid, the embedding and the labels are at rest from the first frame; the
+     lanes draw in and the stream fades up already moving. ---------- */
+  const tl = gsap.timeline();
   tl.fromTo("[data-lane]", { drawSVG: "0%" }, { drawSVG: "100%", duration: 1.1, ease: EASE.inOut, stagger: 0.06 }, 0)
-    .from(cells, { opacity: 0, duration: 0.5, ease: "none", stagger: { amount: 0.8, from: "start" } }, 0.2)
-    .from("[data-focus]", { scale: 0, transformOrigin: "50% 50%", duration: 0.7 }, 0.75)
-    .from("[data-stream]", { opacity: 0, duration: 0.8, ease: "none" }, 0.7)
-    .from("[data-label]", { opacity: 0, y: 4, duration: 0.8, stagger: 0.1 }, 0.5);
+    .from("[data-stream]", { opacity: 0, duration: 0.8, ease: "none" }, 0.7);
 
   /* ---------- Loop: one clock drives the whole stream; it repeats exactly after `cycle`. ---------- */
   const clock = { t: 0 };

@@ -18,21 +18,16 @@ import {
 } from "./shared";
 
 const INTRO_END = 3.7;
-/** Intro timing (s) for the points: noise fades in first, then every class point fades in where it
- *  was scattered and glides home. Starts are staggered in a seeded random order. */
-const NOISE_FADE = { spread: 0.6, duration: 0.8 };
-const DOT_FADE = { at: 0.05, spread: 0.5, duration: 0.5 };
+/** Intro timing (s) for the points: every class point starts where it was scattered, among the
+ *  noise, and glides home. Starts are staggered in a seeded random order. */
 const DOT_GLIDE = { at: 0.3, spread: 0.55, duration: 2 };
 
 type Point = {
   el: SVGCircleElement;
-  fadeAt: number;
-  fadeFor: number;
   glideAt: number;
   dx: number;
   dy: number;
   /** Eased progress last written to the DOM (1 = the markup's settled state). */
-  shownFade: number;
   shownGlide: number;
 };
 
@@ -79,25 +74,17 @@ function clustersTimeline(el: HTMLElement, layout: ClustersLayout): Playback {
     pen.setAttribute("cy", r1(y).toString());
   };
 
-  // Hundreds of points: one clock renders their fades and glides with plain attribute writes, so
-  // there are no per-point tweens to set up and no per-point style reads.
-  const noiseAt = randomStagger(noise.length, NOISE_FADE.spread, 3);
-  const fadeAt = randomStagger(dots.length, DOT_FADE.spread, 5);
+  // Hundreds of points: one clock renders their glides with plain attribute writes, so there are
+  // no per-point tweens to set up and no per-point style reads. The points are visible throughout
+  // (the first frame is the scatter, not an empty plot); only the class points move.
   const glideAt = randomStagger(dots.length, DOT_GLIDE.spread, 7);
-  const point = (dot: SVGCircleElement, fade: number, fadeFor: number, glide: number): Point => ({
+  const points: Point[] = dots.map((dot, i) => ({
     el: dot,
-    fadeAt: fade,
-    fadeFor,
-    glideAt: glide,
+    glideAt: DOT_GLIDE.at + glideAt[i],
     dx: Number(dot.dataset.dx ?? 0),
     dy: Number(dot.dataset.dy ?? 0),
-    shownFade: 1,
     shownGlide: 1,
-  });
-  const points = [
-    ...noise.map((dot, i) => point(dot, noiseAt[i], NOISE_FADE.duration, -Infinity)),
-    ...dots.map((dot, i) => point(dot, DOT_FADE.at + fadeAt[i], DOT_FADE.duration, DOT_GLIDE.at + glideAt[i])),
-  ];
+  }));
   const clock = { t: 0 };
   // Eased 0→1 progress of a phase; exactly 1 once it is over, so settled points get their markup back.
   const phase = (ease: (p: number) => number, start: number, duration: number) => {
@@ -106,13 +93,7 @@ function clustersTimeline(el: HTMLElement, layout: ClustersLayout): Playback {
   };
   const renderPoints = () => {
     for (const p of points) {
-      const fade = phase(EASE.out, p.fadeAt, p.fadeFor);
       const glide = phase(EASE.inOut, p.glideAt, DOT_GLIDE.duration);
-      if (fade !== p.shownFade) {
-        p.shownFade = fade;
-        if (fade >= 1) p.el.removeAttribute("opacity");
-        else p.el.setAttribute("opacity", fade.toFixed(3));
-      }
       if (glide !== p.shownGlide) {
         p.shownGlide = glide;
         if (glide >= 1) p.el.removeAttribute("transform");
@@ -124,15 +105,14 @@ function clustersTimeline(el: HTMLElement, layout: ClustersLayout): Playback {
   renderPoints(); // the intro's first frame, before it plays
 
   const tl = gsap.timeline({ defaults: { ease: EASE.out } });
-  tl.from("[data-grid]", { opacity: 0, duration: 1.4, ease: "none" }, 0)
-    .to(clock, { t: pointsEnd, duration: pointsEnd, ease: "none", onUpdate: renderPoints }, 0)
-    .from("[data-label='corner']", { opacity: 0, y: 4, duration: 0.8 }, 0.5)
+  tl.to(clock, { t: pointsEnd, duration: pointsEnd, ease: "none", onUpdate: renderPoints }, 0)
     .fromTo(boundary, { drawSVG: "0%" }, { drawSVG: "100%", duration: 1.5, ease: EASE.inOut }, 2.05)
     .fromTo(pen, { opacity: 0 }, { opacity: 1, duration: 0.2, ease: "none", immediateRender: false }, 2.05)
     .fromTo(tip, { at: 0 }, { at: edge.length, duration: 1.5, ease: EASE.inOut, onUpdate: movePen }, 2.05)
     .to(pen, { opacity: 0, duration: 0.5, ease: "none" }, 3.45)
     .from("[data-margin]", { opacity: 0, duration: 1, ease: "none" }, 3);
   if (layout.caption.text) {
+    // The caption names the boundary, so it arrives with it (the plot's own label is at rest).
     tl.fromTo("[data-leader]", { drawSVG: "0%" }, { drawSVG: "100%", duration: 0.5, ease: EASE.inOut }, 3.05).from(
       "[data-label='caption']",
       { opacity: 0, duration: 0.7 },
@@ -171,10 +151,7 @@ function clustersTimeline(el: HTMLElement, layout: ClustersLayout): Playback {
     timeline: tl,
     introEnd: INTRO_END,
     reset: () => {
-      for (const p of points) {
-        p.el.removeAttribute("opacity");
-        p.el.removeAttribute("transform");
-      }
+      for (const p of points) p.el.removeAttribute("transform");
     },
   };
 }

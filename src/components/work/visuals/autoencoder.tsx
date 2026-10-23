@@ -15,8 +15,6 @@ import {
   type Variant,
 } from "./shared";
 
-const INTRO_END = 1.5;
-
 /**
  * Alert prioritization: an hourglass autoencoder. Alerts stream through the latent bottleneck;
  * most are reconstructed faithfully and leave unremarked, a few come out wrong and are flagged.
@@ -49,22 +47,9 @@ function autoencoderTimeline(el: HTMLElement, layout: AutoencoderLayout): Playba
   const streaks = q<SVGPathElement>("[data-streak]");
   const pings = q<SVGCircleElement>("[data-ping]");
 
-  /* ---------- Intro: the network assembles layer by layer; alerts fade in where they are. ---------- */
-  const tl = gsap.timeline({ defaults: { ease: EASE.out } });
-  tl.from("[data-edge]", { opacity: 0, duration: 1.1, ease: "none", stagger: 0.14 }, 0.1)
-    .from("[data-lane]", { opacity: 0, duration: 1, ease: "none" }, 0.35)
-    .from("[data-latent-ring]", { opacity: 0, scale: 0.4, transformOrigin: "50% 50%", duration: 1 }, 0.45)
-    .from("[data-label]", { opacity: 0, y: 4, duration: 0.8, stagger: 0.08 }, 0.4)
-    .from("[data-alert]", { opacity: 0, duration: 0.8, ease: "none", stagger: 0.04 }, 0.7);
-  q("[data-layer]").forEach((layer, i) => {
-    tl.from(
-      layer.children,
-      { scale: 0, transformOrigin: "50% 50%", duration: 0.6, stagger: { each: 0.035, from: "center" } },
-      i * 0.12,
-    );
-  });
-
-  /* ---------- Stream: starts in its steady state (the settled frame), every alert on its phase. ---------- */
+  /* ---------- No intro: the network and the alerts are at rest in the first frame (the settled
+     markup), and the stream starts from that steady state, every alert on its phase. ---------- */
+  const tl = gsap.timeline();
   const { speed, period } = layout;
   const streakLength = clamp(layout.width * 0.05, 22, 48);
   const stream = gsap.timeline();
@@ -144,11 +129,11 @@ function autoencoderTimeline(el: HTMLElement, layout: AutoencoderLayout): Playba
       period - token.local0,
     );
   });
-  tl.add(stream, INTRO_END - 0.4);
+  tl.add(stream, 0);
 
   return {
     timeline: tl,
-    introEnd: INTRO_END,
+    introEnd: 0,
     // Back to the settled frame: alerts where the markup draws them, streak dashes cleared.
     reset: () => {
       layout.tokens.forEach(({ still }, j) => {

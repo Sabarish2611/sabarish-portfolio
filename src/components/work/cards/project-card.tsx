@@ -64,7 +64,7 @@ export function ProjectCard({ project, total }: { project: Project; total: numbe
           </p>
 
           {/* The one meta line, above the title (decorative: the list itself carries the order). */}
-          <p data-card-meta data-reveal aria-hidden className="eyebrow order-first text-fg-subtle">
+          <p data-card-meta data-reveal aria-hidden className="eyebrow order-first text-fg-muted">
             <span className="text-accent-ink">{project.index}</span> / {String(total).padStart(2, "0")}
           </p>
         </div>
